@@ -1,22 +1,22 @@
 # 🎮 Jogo AED: Receitas de Mainha
 
-> Jogo interativo desenvolvido em **Linguagem C** sobre as comidas típicas do Recife. 
+> Jogo desenvolvido em **Linguagem C** sobre as comidas típicas do Recife. O projeto surgiu de uma atividade prática e avaliativa da disciplina de Algoritmos e Estruturas de Dados.
 
-O jogador entra na pele de um aprendiz de cozinheiro que, com a ajuda de sua mainha, se prepara para uma competição gastronômica regional cuja final acontece no **Marco Zero**.
+O jogador entra na pele de um aprendiz de cozinheiro que, com a ajuda de sua mainha, se prepara para uma competição gastronômica regional cuja fase final acontece no **Marco Zero**.
 
 Inspirado em *Cooking Mama*, o jogo desafia o jogador a preparar pratos como **Bolo de Rolo**, **Tapioca** e **Sururu** seguindo a ordem correta dos passos e respeitando o tempo de cada etapa.
 
 ---
 
 ## 📍 Vibe Recifense
-A ambientação celebra a culinária pernambucana e a cultura popular de Recife. A fase final se passa no **Marco Zero**, ponto turístico mais simbólico da cidade, onde os jurados avaliam o desempenho do jogador na grande final.
+A ambientação celebra a culinária pernambucana e a cultura popular de Recife. A última fase se passa no **Marco Zero**, ponto turístico mais simbólico da cidade, onde os jurados avaliam o desempenho do jogador na grande final.
 
 ---
 
 ## 📖 Sobre o Jogo
 
 * **Público-alvo:** Jogadores iniciantes e casuais.
-* **Narrativa:** O personagem principal decide entrar em uma competição de comidas típicas e treina com a ajuda de sua mainha. A cada fase, uma nova receita regional precisa ser dominada; ao final, figuras icônicas avaliam os pratos numa etapa decisiva no Marco Zero.
+* **Narrativa:** O personagem principal decide entrar em uma competição de comidas típicas e treina para ela com a ajuda de sua mainha. A cada fase, uma nova receita regional precisa ser dominada; ao final, figuras icônicas avaliam os pratos numa etapa decisiva no Marco Zero.
 * **Objetivo:** Aprender todas as receitas, acumular boa pontuação e vencer a competição final (desempenho mínimo de 70%).
 
 ---
@@ -47,7 +47,6 @@ Duas listas encadeadas dão suporte ao jogo:
 ## 🔢 Algoritmos de Ordenação
 
 * **Insertion Sort (Principal):** Organiza os ingredientes coletados pelo jogador, que entram desordenados e precisam ser arrumados antes do preparo.
-* **Bubble Sort (Auxiliar):** Ordena as receitas pelo nível de dificuldade, ajudando o jogador a escolher por onde começar. A escolha se justifica pela simplicidade e por ser adequado a conjuntos pequenos de dados.
 
 ---
 
@@ -59,7 +58,7 @@ O jogo utiliza a **API da OpenAI** para simular os jurados da competição final
 
 ## 🚀 Como compilar e executar
 
-(falta aq)
+
 
 ---
 
@@ -67,11 +66,10 @@ O jogo utiliza a **API da OpenAI** para simular os jurados da competição final
 
 | Nome | Função | GitHub |
 | :--- | :--- | :--- |
-| Marília Liz Alves | Desenvolvedora | [@Marilia](https://github.com/marilializ) |
-| Victor Martins | Desenvolvedor | [@Victor](https://github.com/usuario) |
 | Louise Pessoa | Desenvolvedora | [@Louise](https://github.com/louise-pessoa) |
-| Pedro David Oliveira | Desenvolvedor | [@Pedro](https://github.com/Pedrodavidob) |
+| Marília Liz Alves | Desenvolvedora | [@Marilia](https://github.com/marilializ) |
 | Mateus Lins | Desenvolvedor | [@Mateus](https://github.com/mateuslinsf) |
+| Pedro David Oliveira | Desenvolvedor | [@Pedro](https://github.com/Pedrodavidob) |
+| Victor Martins | Desenvolvedor | [@Victor](https://github.com/usuario) |
 
 ---
-> Projeto desenvolvido como atividade prática da disciplina de Estruturas de Dados.*

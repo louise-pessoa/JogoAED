@@ -1,14 +1,13 @@
 #include "pilha.h"
+#include "receitas.h"
 #include <stdlib.h>
 #include <string.h>
 
 // cria um no com o passo informado
 No* _criar_no_passo(char* acao, char* ingrediente) {
-    No* novo = (No*) malloc(sizeof(No));
+    No* novo = (No*)malloc(sizeof(No));
 
-    if (novo == NULL) {
-        return NULL; 
-    }
+    if (novo == NULL) return NULL;
 
     strcpy(novo->dado.acao, acao);
     strcpy(novo->dado.ingrediente, ingrediente);
