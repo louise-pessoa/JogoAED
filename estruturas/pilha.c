@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// cria um no com o passo informado
 No* _criar_no_passo(char* acao, char* ingrediente) {
     No* novo = (No*) malloc(sizeof(No));
 
@@ -17,10 +18,12 @@ No* _criar_no_passo(char* acao, char* ingrediente) {
     return novo;
 }
 
+// verifica se a pilha esta vazia
 int pilha_vazia(No* topo) {
     return topo == NULL;
 }
 
+// empilha um novo passo
 No* push_passo(No* topo, char* acao, char* ingrediente) {
     No* novo = _criar_no_passo(acao, ingrediente);
 
@@ -34,6 +37,7 @@ No* push_passo(No* topo, char* acao, char* ingrediente) {
     return topo;
 }
 
+// desempilha o topo
 No* pop_passo(No* topo) {
     if (topo == NULL) {
         return NULL; 
@@ -46,6 +50,7 @@ No* pop_passo(No* topo) {
     return topo;
 }
 
+// retorna o passo do topo sem remover
 Passo ver_topo(No* topo) {
     if (topo == NULL) {
         Passo vazio = {"", ""};
@@ -55,6 +60,7 @@ Passo ver_topo(No* topo) {
     return topo->dado;
 }
 
+// empilha todos os passos da receita
 No* carregar_passos(No* topo, Receita* receita) {
     Receita* atual = receita;
 
