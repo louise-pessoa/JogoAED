@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <time.h>
 #include "jogo.h"
-#include "lista.h"    /* funções públicas do módulo de lista   */
-#include "pilha.h"    /* funções públicas do módulo de pilha   */
-#include "logica.h"   /* funções públicas do módulo de lógica  */
+// #include "lista.h"    /* funções públicas do módulo de lista   */
+#include "estruturas/pilha.h"    /* funções públicas do módulo de pilha   */
+// #include "logica.h"   /* funções públicas do módulo de lógica  */
 
 // estado interno do timer
 static clock_t _inicio_timer;
@@ -54,4 +54,9 @@ void resetar_partida(void) {
     pilha_esvaziar();
 
     printf("[SISTEMA] Partida resetada. Pontuacao: %d\n", PONTUACAO_INICIAL);
+}
+// inicia o jogo do zero (primeiro boot da partida)
+void iniciar_jogo(void) {
+    resetar_partida();
+    printf("[SISTEMA] Jogo iniciado. Boa sorte!\n");
 }

@@ -5,9 +5,7 @@
  
 Receita *_criar_no_receita(const char *nome, int dificuldade,int tempo, int pontuacao) {
     Receita *novo = (Receita *) malloc(sizeof(Receita));
-    if (novo == NULL) {
-        return NULL;
-    }
+    if (novo == NULL) return NULL;
 
     strncpy(novo->nome, nome, sizeof(novo->nome) - 1);
     novo->nome[sizeof(novo->nome) - 1] = '\0';

@@ -9,4 +9,3 @@ typedef struct No {
     Passo dado;
     struct No* prox;
 } No;
-
