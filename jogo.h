@@ -2,7 +2,7 @@
 #define JOGO_H
 
 #include <time.h>
-#include "receita.h"
+#include "receitas.h"
 
 // constantes do jogo
 #define PONTUACAO_INICIAL      100
@@ -25,6 +25,7 @@ void   iniciar_timer(void);
 double tempo_decorrido(void);
 int    tempo_esgotado(int limite);
 void   resetar_partida(void);
+void   iniciar_jogo(void);
 
 // funcoes internas nao devem aparecer no .h (_aplicar_penalidade_tempo)
 
