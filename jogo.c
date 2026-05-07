@@ -60,3 +60,12 @@ void iniciar_jogo(void) {
     resetar_partida();
     printf("[SISTEMA] Jogo iniciado. Boa sorte!\n");
 }
+static void _aplicar_penalidade_error(int valor){
+    if (valor <= 0) return;
+    estado.pontuacao -= valor;
+    if(estado.pontuacao < 0){
+        estado.pontuacao = 0;
+    }
+    printf("[PENALIDADE] -%d pontos. Pontuacao atual: %d\n", valor, estado.pontuacao);
+
+    }

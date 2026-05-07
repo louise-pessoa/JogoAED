@@ -8,6 +8,7 @@
 #define PONTUACAO_INICIAL      100
 #define PENALIDADE_POR_SEGUNDO  10
 #define META_FASE_FINAL         70
+#define PENALIDADE_POR_ ERROR   20
 
 // estado da partida
 typedef struct {
