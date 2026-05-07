@@ -1,3 +1,4 @@
+#ifndef RECEITAS_H
 #define RECEITAS_H
 
 struct No;
@@ -29,3 +30,18 @@ Receita *inserir_receita(Receita *lista, const char *nome,int dificuldade, int t
 void listar_receitas(Receita *lista);
 Receita *buscar_receita(Receita *lista, const char *nome);     
 Receita *buscar_receita_idx(Receita *lista, int indice);
+
+// Lista de ingredientes 
+Receita *inserir_ingrediente(Receita *receita, const char *nome, const char *quantidade);
+void listar_ingredientes(const Receita *receita);
+
+
+void definir_passo(Receita *no, const char *acao, const char *ing);
+
+Receita *_criar_no_receita(const char *nome, int dificuldade, int tempo, int pontuacao);
+
+Ingrediente *_criar_no_ingrediente(const char *nome, const char *quantidade);
+
+void liberar_receitas(Receita *lista);
+
+#endif 

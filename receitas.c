@@ -101,3 +101,75 @@ Receita *buscar_receita_idx(Receita *lista, int indice) {
     }
     return NULL;
 }
+
+void definir_passo(Receita *no, const char *acao, const char *ing) {
+    if (no == NULL) return;
+    strncpy(no->passo_acao, acao, sizeof(no->passo_acao) - 1);
+    no->passo_acao[sizeof(no->passo_acao) - 1] = '\0';
+    strncpy(no->ingrediente, ing, sizeof(no->ingrediente) - 1);
+    no->ingrediente[sizeof(no->ingrediente) - 1] = '\0';
+}
+
+// Lista de ingredientes por receita
+
+// Adiciona um ingrediente no final da lista de ingredientes da receita.
+Receita *inserir_ingrediente(Receita *receita, const char *nome,const char *quantidade) {
+    if (receita == NULL) {
+        fprintf(stderr, "Erro: receita nula em inserir_ingrediente.\n");
+        return NULL;
+    }
+
+    Ingrediente *novo = _criar_no_ingrediente(nome, quantidade);
+    if (novo == NULL) return receita;
+
+    if (receita->ingredientes == NULL) {
+        receita->ingredientes = novo;
+    } else {
+        Ingrediente *aux = receita->ingredientes;
+        while (aux->prox != NULL) {
+            aux = aux->prox;
+        }
+        aux->prox = novo;
+    }
+    return receita;
+}
+
+void listar_ingredientes(const Receita *receita) {
+    if (receita == NULL) {
+        printf("Receita invalida.\n");
+        return;
+    }
+
+    printf("\n--- Ingredientes de %s ---\n", receita->nome);
+    if (receita->ingredientes == NULL) {
+        printf("  (nenhum ingrediente cadastrado)\n");
+        return;
+    }
+
+    Ingrediente *aux = receita->ingredientes;
+    int i = 1;
+    while (aux != NULL) {
+        printf("  %d. %-25s - %s\n", i, aux->nome, aux->quantidade);
+        aux = aux->prox;
+        i++;
+    }
+}
+
+//(NP) Adicionei funções de liberação de memória 
+
+static void liberar_ingredientes(Ingrediente *lista) {
+    while (lista != NULL) {
+        Ingrediente *tmp = lista;
+        lista = lista->prox;
+        free(tmp);
+    }
+}
+
+void liberar_receitas(Receita *lista) {
+    while (lista != NULL) {
+        Receita *tmp = lista;
+        lista = lista->prox;
+        liberar_ingredientes(tmp->ingredientes);
+        free(tmp);
+    }
+}
