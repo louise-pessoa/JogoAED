@@ -8,7 +8,8 @@
 #define PONTUACAO_INICIAL      100
 #define PENALIDADE_POR_SEGUNDO  10
 #define META_FASE_FINAL         70
-#define PENALIDADE_POR_ ERROR   20
+#define PENALIDADE_POR_ERROR   20
+
 
 // estado da partida
 typedef struct {
@@ -16,6 +17,8 @@ typedef struct {
     int rodada_atual;
     int em_execucao;
     int fase_final_ativa;
+    int passos_acertados;   
+    int passos_total;
 } EstadoJogo;
 
 // estado global definido em jogo.c
@@ -27,6 +30,9 @@ double tempo_decorrido(void);
 int    tempo_esgotado(int limite);
 void   resetar_partida(void);
 void   iniciar_jogo(void);
+int verificar_vitoria(void);
+void calcular_pontuacao(int acertou, int tempo_gasto, int tempo_limite);
+void _avancar_progresso(void);
 
 // funcoes internas nao devem aparecer no .h (_aplicar_penalidade_tempo)
 

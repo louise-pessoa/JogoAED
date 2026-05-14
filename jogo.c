@@ -49,13 +49,15 @@ void resetar_partida(void) {
     estado.rodada_atual     = 1;
     estado.em_execucao      = 0;
     estado.fase_final_ativa = 0;
+    estado.passos_acertados  = 0;   
+    estado.passos_total      = 0;  
     _inicio_timer           = 0;
 
-    pilha_esvaziar();
+    // pilha_esvaziar();
 
     printf("[SISTEMA] Partida resetada. Pontuacao: %d\n", PONTUACAO_INICIAL);
 }
-// inicia o jogo do zero (primeiro boot da partida)
+
 void iniciar_jogo(void) {
     resetar_partida();
     printf("[SISTEMA] Jogo iniciado. Boa sorte!\n");
@@ -69,3 +71,23 @@ static void _aplicar_penalidade_error(int valor){
     printf("[PENALIDADE] -%d pontos. Pontuacao atual: %d\n", valor, estado.pontuacao);
 
     }
+int verificar_vitoria(void) {
+    return estado.pontuacao >= META_FASE_FINAL;
+}
+void calcular_pontuacao(int acertou, int tempo_gasto, int tempo_limite) {
+    if (!acertou) {
+        _aplicar_penalidade_error(PENALIDADE_POR_ERROR);
+    }
+    int desconto_tempo = _calcular_penalidade_tempo(tempo_gasto, tempo_limite);
+    if (desconto_tempo > 0) {
+        _aplicar_penalidade_error(desconto_tempo);
+    }
+    if (acertou && desconto_tempo == 0) {
+        printf("[PONTUACAO] Acerto perfeito! Pontuacao: %d\n", estado.pontuacao);
+    }
+}
+void _avancar_progresso(void) {
+    estado.passos_acertados++;
+    printf("[PROGRESSO] Passo concluido (%d/%d)\n",
+           estado.passos_acertados, estado.passos_total);
+}
