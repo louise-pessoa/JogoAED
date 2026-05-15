@@ -23,6 +23,7 @@ typedef struct {
 
 // estado global definido em jogo.c
 extern EstadoJogo estado;
+extern Receita *receitas_disponiveis;
 
 // funcoes publicas
 void   iniciar_timer(void);
@@ -33,7 +34,7 @@ void   iniciar_jogo(void);
 int verificar_vitoria(void);
 void calcular_pontuacao(int acertou, int tempo_gasto, int tempo_limite);
 void _avancar_progresso(void);
-
+void integrar_modulos(void);
 // funcoes internas nao devem aparecer no .h (_aplicar_penalidade_tempo)
 
 #endif

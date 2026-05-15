@@ -1,20 +1,23 @@
 #include <stdio.h>
 #include "jogo.h"
+#include "receitas.h"
 
 int main(void) {
     iniciar_jogo();
+    integrar_modulos();
 
-    // simula uma receita de 3 passos
-    estado.passos_total = 3;
+    // lista todas as receitas cadastradas
+    listar_receitas(receitas_disponiveis);
 
-    printf("\n=== Simulando execucao de receita ===\n");
-    _avancar_progresso();  // passo 1 concluido
-    _avancar_progresso();  // passo 2 concluido
-    _avancar_progresso();  // passo 3 concluido (receita terminou)
+    // mostra ingredientes de cada uma
+    Receita *aux = receitas_disponiveis;
+    while (aux != NULL) {
+        listar_ingredientes(aux);
+        aux = aux->prox;
+    }
 
-    printf("\nResumo final:\n");
-    printf("  passos_total:     %d\n", estado.passos_total);
-    printf("  passos_acertados: %d\n", estado.passos_acertados);
+    // libera memoria no final
+    liberar_receitas(receitas_disponiveis);
 
     return 0;
 }
