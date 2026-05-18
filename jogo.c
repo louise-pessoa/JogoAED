@@ -10,6 +10,10 @@ static clock_t _inicio_timer;
 
 // estado global usado por outros modulos
 EstadoJogo estado;
+// lista global de receitas disponiveis no jogo
+Receita *receitas_disponiveis = NULL;
+// tela ativa no momento
+EstadoTela tela_atual = TELA_MENU;
 
 // inicia o cronometro do passo atual
 void iniciar_timer(void) {
@@ -60,6 +64,7 @@ void resetar_partida(void) {
 
 void iniciar_jogo(void) {
     resetar_partida();
+    tela_atual = TELA_MENU;     // <-- ADICIONAR
     printf("[SISTEMA] Jogo iniciado. Boa sorte!\n");
 }
 static void _aplicar_penalidade_error(int valor){
@@ -90,4 +95,42 @@ void _avancar_progresso(void) {
     estado.passos_acertados++;
     printf("[PROGRESSO] Passo concluido (%d/%d)\n",
            estado.passos_acertados, estado.passos_total);
+}
+
+void integrar_modulos(void) {
+    // limpa lista anterior se existir
+    if (receitas_disponiveis != NULL) {
+        liberar_receitas(receitas_disponiveis);
+        receitas_disponiveis = NULL;
+    }
+
+    // === cria as 3 receitas ===
+    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Tapioca",      2, 15, 50);
+    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Sururu",       4, 40, 80);
+    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Bolo de Rolo", 5, 60, 100);
+
+    // === ingredientes da Tapioca ===
+    Receita *tapioca = buscar_receita(receitas_disponiveis, "Tapioca");
+    inserir_ingrediente(tapioca, "Tapioca granulada", "200g");
+    inserir_ingrediente(tapioca, "Coco ralado",       "50g");
+    inserir_ingrediente(tapioca, "Manteiga",          "1 colher");
+
+    // === ingredientes do Sururu ===
+    Receita *sururu = buscar_receita(receitas_disponiveis, "Sururu");
+    inserir_ingrediente(sururu, "Sururu",         "500g");
+    inserir_ingrediente(sururu, "Coentro",        "1 maco");
+    inserir_ingrediente(sururu, "Cebola",         "1 unidade");
+    inserir_ingrediente(sururu, "Leite de coco",  "200ml");
+
+    // === ingredientes do Bolo de Rolo ===
+    Receita *bolo = buscar_receita(receitas_disponiveis, "Bolo de Rolo");
+    inserir_ingrediente(bolo, "Farinha de trigo", "300g");
+    inserir_ingrediente(bolo, "Manteiga",         "200g");
+    inserir_ingrediente(bolo, "Ovos",             "6 unidades");
+    inserir_ingrediente(bolo, "Goiabada",         "300g");
+    inserir_ingrediente(bolo, "Acucar",           "200g");
+
+    // TODO: passos das receitas - alinhar design com Mateus
+
+    printf("[SISTEMA] Modulos integrados. 3 receitas disponiveis.\n");
 }
