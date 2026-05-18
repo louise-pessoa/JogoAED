@@ -1,29 +1,29 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
+#include "raylib.h"
 #include "receitas.h"
 #include "jogo.h"
 
-// menu principal
-void exibir_menu(void);
+// tela menu principal
+void tela_menu(void);
 
-// telas de navegacao
-void exibir_tela_receitas(Receita *lista);
-void exibir_tela_ingredientes(Receita *receita);
-void exibir_tela_creditos(void);
-void exibir_tela_pontuacao(void);
+// tela de lista de receitas
+void tela_receitas(Receita *lista);
 
-// feedback durante o jogo
-void exibir_feedback_acerto(void);
-void exibir_feedback_erro(void);
-void exibir_feedback_tempo_esgotado(void);
+// tela de ingredientes de uma receita
+void tela_ingredientes(Receita *receita);
 
-// tela de resultado final
-void exibir_resultado_final(int venceu);
+// tela de cozinhar (pilha de passos)
+void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double tempo);
 
-// utilitarios de exibicao
-void limpar_tela(void);
-void exibir_separador(void);
-void pausar(void);
+// tela de feedback apos cada passo (1 = acertou, 0 = errou)
+void tela_feedback(int acertou);
+
+// tela de resultado final (1 = venceu, 0 = perdeu)
+void tela_resultado(int venceu);
+
+// tela de creditos
+void tela_creditos(void);
 
 #endif
