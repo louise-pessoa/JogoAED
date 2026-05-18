@@ -21,9 +21,22 @@ typedef struct {
     int passos_total;
 } EstadoJogo;
 
+// estados de tela do jogo (qual tela esta sendo exibida)
+typedef enum {
+    TELA_MENU,
+    TELA_RECEITAS,
+    TELA_INGREDIENTES,
+    TELA_CATCHER,
+    TELA_PILHA,           // execucao da receita (cozinhar)
+    TELA_FEEDBACK,
+    TELA_RESULTADO,
+    TELA_CREDITOS
+} EstadoTela;
+
 // estado global definido em jogo.c
 extern EstadoJogo estado;
 extern Receita *receitas_disponiveis;
+extern EstadoTela tela_atual;
 
 // funcoes publicas
 void   iniciar_timer(void);

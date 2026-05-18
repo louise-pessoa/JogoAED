@@ -12,6 +12,8 @@ static clock_t _inicio_timer;
 EstadoJogo estado;
 // lista global de receitas disponiveis no jogo
 Receita *receitas_disponiveis = NULL;
+// tela ativa no momento
+EstadoTela tela_atual = TELA_MENU;
 
 // inicia o cronometro do passo atual
 void iniciar_timer(void) {
@@ -62,6 +64,7 @@ void resetar_partida(void) {
 
 void iniciar_jogo(void) {
     resetar_partida();
+    tela_atual = TELA_MENU;     // <-- ADICIONAR
     printf("[SISTEMA] Jogo iniciado. Boa sorte!\n");
 }
 static void _aplicar_penalidade_error(int valor){
