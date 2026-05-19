@@ -108,7 +108,7 @@ void integrar_modulos(void) {
 
     // === cria as 3 receitas ===
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Tapioca",      2, 15, 50);
-    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Sururu",       4, 40, 80);
+    receitas_disponiveis = inserir_receita(receitas_disponiveis, "Escondidinho", 4, 40, 80);
     receitas_disponiveis = inserir_receita(receitas_disponiveis, "Bolo de Rolo", 5, 60, 100);
 
     // === ingredientes da Tapioca ===
@@ -117,12 +117,12 @@ void integrar_modulos(void) {
     inserir_ingrediente(tapioca, "Coco ralado",       "50g");
     inserir_ingrediente(tapioca, "Manteiga",          "1 colher");
 
-    // === ingredientes do Sururu ===
-    Receita *sururu = buscar_receita(receitas_disponiveis, "Sururu");
-    inserir_ingrediente(sururu, "Sururu",         "500g");
-    inserir_ingrediente(sururu, "Coentro",        "1 maco");
-    inserir_ingrediente(sururu, "Cebola",         "1 unidade");
-    inserir_ingrediente(sururu, "Leite de coco",  "200ml");
+    // === ingredientes do Escondidinho de Carne de Sol ===
+    Receita *escondidinho = buscar_receita(receitas_disponiveis, "Escondidinho");
+    inserir_ingrediente(escondidinho, "Carne de sol",  "400g");
+    inserir_ingrediente(escondidinho, "Mandioca",      "600g");
+    inserir_ingrediente(escondidinho, "Queijo coalho", "200g");
+    inserir_ingrediente(escondidinho, "Manteiga",      "2 colheres");
 
     // === ingredientes do Bolo de Rolo ===
     Receita *bolo = buscar_receita(receitas_disponiveis, "Bolo de Rolo");
@@ -141,15 +141,15 @@ void integrar_modulos(void) {
     adicionar_passo_jogavel(tapioca, "Derreta a manteiga na frigideira",
                             "Manteiga", "SPACE", 8);
 
-    // sururu: limpa, corta cebola/coentro, refoga, finaliza com leite de coco
-    adicionar_passo_jogavel(sururu, "Lave bem o sururu",
-                            "Sururu", "WSWS", 12);
-    adicionar_passo_jogavel(sururu, "Pique a cebola",
-                            "Cebola", "QEQE", 10);
-    adicionar_passo_jogavel(sururu, "Pique o coentro",
-                            "Coentro", "QWE", 10);
-    adicionar_passo_jogavel(sururu, "Refogue tudo com leite de coco",
-                            "Leite de coco", "WASDW", 15);
+    // escondidinho: dessalga a carne, cozinha mandioca, desfaz carne, monta e gratina
+    adicionar_passo_jogavel(escondidinho, "Dessalgue e grelhe a carne de sol",
+                            "Carne de sol", "WSWS", 12);
+    adicionar_passo_jogavel(escondidinho, "Cozinhe e amasse a mandioca",
+                            "Mandioca", "SSSS", 10);
+    adicionar_passo_jogavel(escondidinho, "Misture manteiga ao pure",
+                            "Manteiga", "ADAD", 10);
+    adicionar_passo_jogavel(escondidinho, "Monte e cubra com queijo coalho",
+                            "Queijo coalho", "QWER", 12);
 
     // bolo de rolo: cremeia manteiga+acucar, ovos, farinha, recheia
     adicionar_passo_jogavel(bolo, "Bata manteiga com acucar",

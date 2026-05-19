@@ -120,6 +120,7 @@ static void spawnar_item(void) {
         if (n > 0) escolha = candidatos[GetRandomValue(0, n - 1)];
         else       escolha = GetRandomValue(0, catcher.n_alvos - 1);
 
+        catcher.spawnou[escolha] = 1;
         it->eh_da_receita = 1;
         it->idx_alvo = escolha;
         strncpy(it->nome, catcher.alvos[escolha].nome, sizeof(it->nome) - 1);
@@ -138,6 +139,27 @@ static void spawnar_item(void) {
         strncpy(it->nome, nome, sizeof(it->nome) - 1);
         it->nome[sizeof(it->nome) - 1] = '\0';
     }
+}
+
+// força o spawn de um ingrediente específico (pelo índice em alvos)
+static void spawnar_forcado(int idx) {
+    int slot = -1;
+    for (int i = 0; i < CATCHER_MAX_ITENS; i++) {
+        if (!catcher.itens[i].ativo) { slot = i; break; }
+    }
+    if (slot < 0) return;
+
+    ItemCaindo *it = &catcher.itens[slot];
+    it->ativo = 1;
+    it->x = frand(60.0f, (float)LARG_TELA - 60.0f);
+    it->y = (float)ALT_HUD - ITEM_RAIO;
+    it->velocidade = frand(ITEM_VEL_MIN, ITEM_VEL_MIN + 40.0f);
+    it->cor = CORES_ITEM[GetRandomValue(0, N_CORES_ITEM - 1)];
+    it->eh_da_receita = 1;
+    it->idx_alvo = idx;
+    catcher.spawnou[idx] = 1;
+    strncpy(it->nome, catcher.alvos[idx].nome, sizeof(it->nome) - 1);
+    it->nome[sizeof(it->nome) - 1] = '\0';
 }
 
 // ==========================================
@@ -246,6 +268,16 @@ void catcher_atualizar(void) {
         catcher.cesta_x = LARG_TELA - catcher.cesta_w;
     }
 
+    // ---- garantia: forcas spawn de ingredientes que nunca apareceram ----
+    float restante_seg = (float)CATCHER_TEMPO_LIMITE - catcher.tempo_decorrido;
+    if (restante_seg <= 8.0f) {
+        for (int i = 0; i < catcher.n_alvos; i++) {
+            if (!catcher.alvos[i].coletado && !catcher.spawnou[i]) {
+                spawnar_forcado(i);
+            }
+        }
+    }
+
     // ---- spawn de itens ----
     catcher.spawn_timer += dt;
     // intervalo encurta com o tempo pra aumentar pressao
@@ -261,6 +293,7 @@ void catcher_atualizar(void) {
         ItemCaindo *it = &catcher.itens[i];
         if (!it->ativo) continue;
 
+        it->velocidade += 120.0f * dt;  // aceleracao gravitacional
         it->y += it->velocidade * dt;
 
         // pegou na cesta?
@@ -316,7 +349,7 @@ static void desenhar_cesta(void) {
 
     // corpo da cesta (trapezoide simulado por dois retangulos)
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA);
-    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA_ESC);
+    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.35f, 8, 2.0f, COR_CESTA_ESC);
 
     // tramas horizontais
     for (int i = 1; i < 4; i++) {
@@ -382,7 +415,7 @@ static void desenhar_checklist(void) {
 
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.1f, 8,
                          (Color){255, 255, 255, 220});
-    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.1f, 8, COR_HUD);
+    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.1f, 8, 2.0f, COR_HUD);
     DrawText("Receita", x + 12, y + 8, 18, COR_TEXTO);
 
     for (int i = 0; i < catcher.n_alvos; i++) {
@@ -445,59 +478,6 @@ static void desenhar_tela_fim(void) {
 }
 
 void tela_catcher(void) {
-    // se nao foi iniciado ainda, mostra tela de inicio com a lista
-    if (!catcher.iniciado) {
-        ClearBackground((Color){255, 243, 210, 255});
-
-        // cabecalho
-        DrawRectangle(0, 0, LARG_TELA, 60, (Color){30, 100, 200, 255});
-        DrawRectangle(0, 55, LARG_TELA, 5, (Color){255, 200, 0, 255});
-        DrawText("MINIGAME DA CESTA", 230, 16, 28, WHITE);
-
-        if (receita_selecionada == NULL) {
-            DrawText("Nenhuma receita selecionada.", 200, 250, 24, COR_RUIM);
-            DrawText("Volte para o menu de receitas (tecla 2)",
-                     180, 290, 20, COR_TEXTO);
-            return;
-        }
-
-        // titulo da receita
-        DrawRectangleRounded((Rectangle){50, 80, 700, 50}, 0.3f, 8,
-                             (Color){255, 140, 0, 255});
-        int tw = MeasureText(receita_selecionada->nome, 28);
-        DrawText(receita_selecionada->nome, (LARG_TELA - tw) / 2, 90,
-                 28, WHITE);
-
-        // lista de ingredientes a coletar
-        DrawText("Voce precisa pegar:", 80, 150, 22, COR_TEXTO);
-        Ingrediente *ing = receita_selecionada->ingredientes;
-        int i = 0, y = 185;
-        Color cores[] = { COR_RUIM, COR_BOM, {30,100,200,255}, {255,140,0,255} };
-        while (ing != NULL && i < 8) {
-            DrawCircle(100, y + 10, 14, cores[i % 4]);
-            DrawText(TextFormat("%d", i + 1), 95, y + 3, 16, WHITE);
-            DrawText(ing->nome, 125, y, 20, COR_TEXTO);
-            DrawText(ing->quantidade, 420, y + 2, 18, GRAY);
-            ing = ing->prox;
-            y += 30;
-            i++;
-        }
-
-        // dica e instrucoes
-        DrawRectangleRounded((Rectangle){80, 430, 640, 60}, 0.2f, 8,
-                             (Color){255, 235, 180, 255});
-        DrawRectangleRoundedLines((Rectangle){80, 430, 640, 60}, 0.2f, 8,
-                                  (Color){200, 150, 50, 255});
-        DrawText("Cuidado! Itens errados tambem caem.", 100, 444, 20,
-                 COR_TEXTO);
-        DrawText("Cada segundo sem terminar custa 1 ponto.", 100, 466, 18,
-                 COR_TEXTO);
-
-        DrawText("[ENTER] Iniciar  |  [<-] [->] mover cesta  |  [P] Pausa",
-                 110, 520, 18, COR_TEXTO);
-        return;
-    }
-
     catcher_atualizar();
 
     ClearBackground(COR_CEU);

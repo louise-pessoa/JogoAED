@@ -145,14 +145,7 @@ static void fase_clicar(void) {
 }
 
 static void fase_teclas(void) {
-    cozinhar.tempo_passo += GetFrameTime();
     PassoJogavel *p = &cozinhar.receita->passos_jog[cozinhar.passo_idx];
-
-    // estourou tempo?
-    if (p->tempo_limite > 0 && cozinhar.tempo_passo > (float)p->tempo_limite) {
-        avancar_passo(0);
-        return;
-    }
 
     // qualquer tecla pressionada?
     int tecla = GetKeyPressed();
@@ -184,14 +177,17 @@ static void fase_teclas(void) {
 static void fase_feedback(void) {
     cozinhar.feedback_timer += GetFrameTime();
     if (cozinhar.feedback_timer >= 1.0f) {
-        cozinhar.passo_idx++;
-        if (cozinhar.passo_idx >= cozinhar.receita->n_passos_jog) {
-            cozinhar.terminou = 1;
-            cozinhar.venceu = (cozinhar.erros < cozinhar.receita->n_passos_jog);
-            cozinhar.fase = COZ_FASE_FIM;
-            estado.pontuacao = cozinhar.pontos;
-            return;
+        if (cozinhar.feedback_acerto) {
+            cozinhar.passo_idx++;
+            if (cozinhar.passo_idx >= cozinhar.receita->n_passos_jog) {
+                cozinhar.terminou = 1;
+                cozinhar.venceu = 1;
+                cozinhar.fase = COZ_FASE_FIM;
+                estado.pontuacao = cozinhar.pontos;
+                return;
+            }
         }
+        // se errou, reinicia o mesmo passo; se acertou, ja avancou o idx acima
         cozinhar.fase = COZ_FASE_CLICAR;
         cozinhar.tempo_passo = 0.0f;
         cozinhar.pos_tecla = 0;
@@ -228,7 +224,7 @@ static void desenhar_instrucao(void) {
 
     // balao de instrucao
     DrawRectangleRounded((Rectangle){40, 80, 720, 110}, 0.2f, 8, WHITE);
-    DrawRectangleRoundedLines((Rectangle){40, 80, 720, 110}, 0.2f, 8,
+    DrawRectangleRoundedLines((Rectangle){40, 80, 720, 110}, 0.2f, 8, 2.0f,
                               COR_AZUL_COZ);
     DrawText("Instrucao:", 60, 92, 18, COR_AZUL_COZ);
     DrawText(p->acao, 60, 116, 22, COR_TEXTO_COZ);
@@ -241,11 +237,6 @@ static void desenhar_instrucao(void) {
                  60, 150, 18, COR_VERDE_COZ);
     }
 
-    // tempo restante
-    int restante = p->tempo_limite - (int)cozinhar.tempo_passo;
-    if (restante < 0) restante = 0;
-    Color cor = restante <= 3 ? COR_VERM_COZ : COR_TEXTO_COZ;
-    DrawText(TextFormat("Tempo: %02ds", restante), 640, 92, 22, cor);
 }
 
 static void desenhar_sequencia(void) {
@@ -280,7 +271,7 @@ static void desenhar_sequencia(void) {
             borda = (Color){180, 180, 180, 255};
         }
         DrawRectangleRounded((Rectangle){x, y0, box, box}, 0.25f, 8, fundo);
-        DrawRectangleRoundedLines((Rectangle){x, y0, box, box}, 0.25f, 8,
+        DrawRectangleRoundedLines((Rectangle){x, y0, box, box}, 0.25f, 8, 2.0f,
                                   borda);
         const char *nome = nome_tecla(p->teclas[k]);
         int tam = (strlen(nome) > 1) ? 18 : 32;
@@ -299,7 +290,7 @@ static void desenhar_grid(void) {
         else                       fundo = WHITE;
 
         DrawRectangleRounded(it->area, 0.25f, 8, fundo);
-        DrawRectangleRoundedLines(it->area, 0.25f, 8,
+        DrawRectangleRoundedLines(it->area, 0.25f, 8, 2.0f,
                                   it->destacado ? COR_LARA_COZ
                                                 : (Color){180,180,180,255});
         if (it->destacado && cozinhar.fase == COZ_FASE_CLICAR) {
@@ -307,7 +298,7 @@ static void desenhar_grid(void) {
             DrawRectangleRoundedLines(
                 (Rectangle){ it->area.x - 3, it->area.y - 3,
                              it->area.width + 6, it->area.height + 6 },
-                0.25f, 8, COR_LARA_COZ);
+                0.25f, 8, 2.0f, COR_LARA_COZ);
         }
 
         int tw = MeasureText(it->nome, 16);
