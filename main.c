@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
+#include <pthread.h>
 #include "raylib.h"
+#include "groq.h"
 #include "jogo.h"
 #include "interface.h"
 #include "receitas.h"
@@ -11,8 +13,6 @@
 #define LARG_VIRTUAL 800
 #define ALT_VIRTUAL  600
 
-// alterna entre janela e tela cheia, ajustando o tamanho da janela
-// pra casar com a resolucao do monitor (evita esticar feio).
 static void alternar_fullscreen(void) {
     int monitor = GetCurrentMonitor();
     int mw = GetMonitorWidth(monitor);
@@ -28,15 +28,10 @@ static void alternar_fullscreen(void) {
     }
 }
 
-// Receita selecionada via tecla 1-3 dentro da tela de receitas.
 static void atualizar_selecao_receitas(void) {
     if (tela_atual != TELA_RECEITAS) return;
 
-    if (IsKeyPressed(KEY_ONE)) {
-        receita_selecionada = buscar_receita_idx(receitas_disponiveis, 1);
-        return; // tecla 1 tambem volta pro menu; mas se ja estamos em receitas,
-                // priorizamos a selecao
-    }
+    if (IsKeyPressed(KEY_ONE))   receita_selecionada = buscar_receita_idx(receitas_disponiveis, 1);
     if (IsKeyPressed(KEY_TWO))   receita_selecionada = buscar_receita_idx(receitas_disponiveis, 2);
     if (IsKeyPressed(KEY_THREE)) receita_selecionada = buscar_receita_idx(receitas_disponiveis, 3);
 
@@ -45,10 +40,27 @@ static void atualizar_selecao_receitas(void) {
         tela_atual = TELA_INGREDIENTES;
     }
 }
-#include "groq.h"
 
+// --- avaliacao dos jurados em thread separada ---
 static ResultadoJurados jurados;
-static int jurados_prontos = 0;
+static int jurados_prontos     = 0;
+static int jurados_solicitados = 0;
+static pthread_t _thread_jurados_id;
+
+static void *_thread_jurados(void *arg) {
+    (void)arg;
+    jurados       = avaliar_com_jurados(estado);
+    jurados_prontos = 1;
+    return NULL;
+}
+
+static void disparar_jurados(void) {
+    if (jurados_solicitados) return;
+    jurados_solicitados = 1;
+    jurados_prontos     = 0;
+    pthread_create(&_thread_jurados_id, NULL, _thread_jurados, NULL);
+    pthread_detach(_thread_jurados_id);
+}
 
 int main(void) {
     iniciar_jogo();
@@ -67,19 +79,27 @@ int main(void) {
             (IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_ENTER))) {
             alternar_fullscreen();
         }
-        if (IsKeyPressed(KEY_ONE))   tela_atual = TELA_MENU;
-        if (IsKeyPressed(KEY_TWO))   tela_atual = TELA_RECEITAS;
-        if (IsKeyPressed(KEY_THREE)) tela_atual = TELA_INGREDIENTES;
-        if (IsKeyPressed(KEY_FIVE))  tela_atual = TELA_PILHA;
-        if (IsKeyPressed(KEY_SIX))   tela_atual = TELA_FEEDBACK;
-        if (IsKeyPressed(KEY_SEVEN)) {
-            if (!jurados_prontos) {
-                jurados = avaliar_com_jurados(estado);
-                jurados_prontos = 1;
+
+        // ---- atalhos de debug (bloqueados nas telas jogaveis) ----
+        if (tela_atual != TELA_CATCHER &&
+            tela_atual != TELA_ORDENACAO &&
+            tela_atual != TELA_PILHA) {
+
+            if (IsKeyPressed(KEY_ONE)   && tela_atual != TELA_RECEITAS) tela_atual = TELA_MENU;
+            if (IsKeyPressed(KEY_TWO)   && tela_atual != TELA_RECEITAS) tela_atual = TELA_RECEITAS;
+            if (IsKeyPressed(KEY_THREE) && tela_atual != TELA_RECEITAS) tela_atual = TELA_INGREDIENTES;
+            if (IsKeyPressed(KEY_SIX))   tela_atual = TELA_FEEDBACK;
+            if (IsKeyPressed(KEY_SEVEN)) {
+                disparar_jurados();
+                tela_atual = TELA_RESULTADO;
             }
-            tela_atual = TELA_RESULTADO;
+            if (IsKeyPressed(KEY_EIGHT)) tela_atual = TELA_CREDITOS;
         }
-        if (IsKeyPressed(KEY_EIGHT)) tela_atual = TELA_CREDITOS;
+        if (IsKeyPressed(KEY_FIVE) &&
+            tela_atual != TELA_CATCHER &&
+            tela_atual != TELA_ORDENACAO) {
+            tela_atual = TELA_PILHA;
+        }
 
         // ---- transforma coordenadas do mouse para o canvas virtual ----
         float sw = (float)GetScreenWidth();
@@ -91,16 +111,6 @@ int main(void) {
         float vy = (sh - vh) * 0.5f;
         SetMouseOffset((int)(-vx), (int)(-vy));
         SetMouseScale(1.0f / escala, 1.0f / escala);
-
-        // ---- navegacao livre (so quando nao estamos em telas jogaveis) ----
-        if (tela_atual != TELA_CATCHER &&
-            tela_atual != TELA_ORDENACAO &&
-            tela_atual != TELA_PILHA) {
-            if (IsKeyPressed(KEY_ONE) && tela_atual != TELA_RECEITAS)
-                tela_atual = TELA_MENU;
-            if (IsKeyPressed(KEY_TWO))   tela_atual = TELA_RECEITAS;
-            if (IsKeyPressed(KEY_EIGHT)) tela_atual = TELA_CREDITOS;
-        }
 
         // ---- logica de cada tela ----
         switch (tela_atual) {
@@ -133,6 +143,7 @@ int main(void) {
                             ordenacao_iniciar(receita_selecionada);
                             tela_atual = TELA_ORDENACAO;
                         } else {
+                            disparar_jurados();
                             tela_atual = TELA_RESULTADO;
                         }
                     }
@@ -150,6 +161,7 @@ int main(void) {
             case TELA_PILHA:
                 if (cozinhar.terminou &&
                     IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
+                    disparar_jurados();
                     tela_atual = TELA_RESULTADO;
                 }
                 break;
@@ -157,7 +169,9 @@ int main(void) {
             case TELA_RESULTADO:
                 if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
                     resetar_partida();
-                    receita_selecionada = NULL;
+                    receita_selecionada  = NULL;
+                    jurados_prontos      = 0;
+                    jurados_solicitados  = 0;
                     tela_atual = TELA_MENU;
                 }
                 break;
@@ -191,7 +205,8 @@ int main(void) {
                 tela_feedback(1);
                 break;
             case TELA_RESULTADO:
-                tela_resultado(verificar_vitoria(), &jurados);
+                tela_resultado(verificar_vitoria(),
+                               jurados_prontos ? &jurados : NULL);
                 break;
             case TELA_CREDITOS:
                 tela_creditos();

@@ -3,7 +3,6 @@
 #include "jogo.h"
 #include "receitas.h"
 #include "estruturas/pilha.h"
-#include "groq.h"
 
 // estado interno do timer
 static clock_t _inicio_timer;

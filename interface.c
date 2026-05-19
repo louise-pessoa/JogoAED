@@ -117,22 +117,39 @@ void tela_receitas(Receita *lista) {
     if (lista == NULL) {
         DrawText("Nenhuma receita cadastrada.", 80, 200, 20, GRAY);
     } else {
-        // cores alternadas pra cada receita
         Color cores[] = {COR_VERMELHO, COR_VERDE, COR_AZUL, COR_LARANJA, COR_VERMELHO, COR_VERDE, COR_AZUL, COR_LARANJA};
+        Vector2 mouse = GetMousePosition();
         Receita *aux = lista;
-        int i = 0;
-        int y = 120;
+        int i = 0, y = 120;
         while (aux != NULL && i < 8) {
-            // destaca a receita selecionada
-            int eh_sel = (receita_selecionada == aux);
-            if (eh_sel) {
+            Rectangle card = {50, y, 420, 48};
+            int eh_sel   = (receita_selecionada == aux);
+            int hovered  = CheckCollisionPointRec(mouse, card);
+
+            // borda amarela se selecionado
+            if (eh_sel)
                 DrawRectangleRounded((Rectangle){46, y - 4, 428, 56}, 0.3f, 8, COR_AMARELO);
+
+            // card — um pouco mais escuro se hover
+            Color cor = cores[i];
+            if (hovered && !eh_sel) {
+                cor.r = (unsigned char)(cor.r > 30 ? cor.r - 30 : 0);
+                cor.g = (unsigned char)(cor.g > 30 ? cor.g - 30 : 0);
+                cor.b = (unsigned char)(cor.b > 30 ? cor.b - 30 : 0);
             }
-            // card da receita
-            DrawRectangleRounded((Rectangle){50, y, 420, 48}, 0.3f, 8, cores[i]);
+            DrawRectangleRounded(card, 0.3f, 8, cor);
             DrawText(TextFormat("[%d] %s", i + 1, aux->nome), 70, y + 8, 20, WHITE);
             DrawText(TextFormat("Dif: %d", aux->dificuldade), 370, y + 8, 18, WHITE);
-            DrawText(TextFormat("%d passos", aux->n_passos_jog), 70, y + 28, 14, COR_AMARELO);
+            if (hovered)
+                DrawText("Clique para selecionar", 70, y + 28, 13, COR_AMARELO);
+            else
+                DrawText(TextFormat("%d passos", aux->n_passos_jog), 70, y + 28, 14, COR_AMARELO);
+
+            // seleciona ao clicar
+            if (hovered && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                receita_selecionada = aux;
+            }
+
             aux = aux->prox;
             y += 56;
             i++;
