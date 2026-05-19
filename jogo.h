@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include "receitas.h"
+#include "estruturas/pilha.h"
 
 // constantes do jogo
 #define PONTUACAO_INICIAL      100
@@ -34,9 +35,11 @@ typedef enum {
 } EstadoTela;
 
 // estado global definido em jogo.c
-extern EstadoJogo estado;
-extern Receita *receitas_disponiveis;
-extern EstadoTela tela_atual;
+extern EstadoJogo  estado;
+extern Receita    *receitas_disponiveis;
+extern Receita    *receita_ativa;
+extern No         *pilha_ativa;
+extern EstadoTela  tela_atual;
 
 // funcoes publicas
 void   iniciar_timer(void);
@@ -44,10 +47,11 @@ double tempo_decorrido(void);
 int    tempo_esgotado(int limite);
 void   resetar_partida(void);
 void   iniciar_jogo(void);
-int verificar_vitoria(void);
-void calcular_pontuacao(int acertou, int tempo_gasto, int tempo_limite);
-void _avancar_progresso(void);
-void integrar_modulos(void);
+int    verificar_vitoria(void);
+void   calcular_pontuacao(int acertou, int tempo_gasto, int tempo_limite);
+void   _avancar_progresso(void);
+void   integrar_modulos(void);
+void   iniciar_receita(Receita *r);
 // funcoes internas nao devem aparecer no .h (_aplicar_penalidade_tempo)
 
 #endif

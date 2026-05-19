@@ -9,11 +9,11 @@
 static clock_t _inicio_timer;
 
 // estado global usado por outros modulos
-EstadoJogo estado;
-// lista global de receitas disponiveis no jogo
-Receita *receitas_disponiveis = NULL;
-// tela ativa no momento
-EstadoTela tela_atual = TELA_MENU;
+EstadoJogo  estado;
+Receita    *receitas_disponiveis = NULL;
+Receita    *receita_ativa        = NULL;
+No         *pilha_ativa          = NULL;
+EstadoTela  tela_atual           = TELA_MENU;
 
 // inicia o cronometro do passo atual
 void iniciar_timer(void) {
@@ -133,4 +133,39 @@ void integrar_modulos(void) {
     // TODO: passos das receitas - alinhar design com Mateus
 
     printf("[SISTEMA] Modulos integrados. 3 receitas disponiveis.\n");
+}
+
+void iniciar_receita(Receita *r) {
+    if (r == NULL) return;
+
+    while (!pilha_vazia(pilha_ativa))
+        pilha_ativa = pop_passo(pilha_ativa);
+
+    receita_ativa = r;
+
+    if (strcmp(r->nome, "Tapioca") == 0) {
+        pilha_ativa = push_passo(pilha_ativa, "Sirva quente",      "");
+        pilha_ativa = push_passo(pilha_ativa, "Feche a tapioca",   "");
+        pilha_ativa = push_passo(pilha_ativa, "Adicione",          "Coco ralado");
+        pilha_ativa = push_passo(pilha_ativa, "Unte a frigideira", "Manteiga");
+        pilha_ativa = push_passo(pilha_ativa, "Espalhe",           "Tapioca granulada");
+        estado.passos_total = 5;
+    } else if (strcmp(r->nome, "Sururu") == 0) {
+        pilha_ativa = push_passo(pilha_ativa, "Sirva com arroz",  "");
+        pilha_ativa = push_passo(pilha_ativa, "Adicione",         "Leite de coco");
+        pilha_ativa = push_passo(pilha_ativa, "Refogue",          "Coentro");
+        pilha_ativa = push_passo(pilha_ativa, "Adicione",         "Cebola");
+        pilha_ativa = push_passo(pilha_ativa, "Lave e limpe",     "Sururu");
+        estado.passos_total = 5;
+    } else if (strcmp(r->nome, "Bolo de Rolo") == 0) {
+        pilha_ativa = push_passo(pilha_ativa, "Enrole com cuidado",   "");
+        pilha_ativa = push_passo(pilha_ativa, "Espalhe",              "Goiabada");
+        pilha_ativa = push_passo(pilha_ativa, "Asse por 10 minutos",  "");
+        pilha_ativa = push_passo(pilha_ativa, "Adicione",             "Ovos");
+        pilha_ativa = push_passo(pilha_ativa, "Misture a massa",      "Farinha e Manteiga");
+        estado.passos_total = 5;
+    }
+
+    estado.passos_acertados = 0;
+    iniciar_timer();
 }
