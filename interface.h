@@ -1,6 +1,7 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
+#include "groq.h"
 #include "raylib.h"
 #include "receitas.h"
 #include "jogo.h"
@@ -21,7 +22,7 @@ void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double
 void tela_feedback(int acertou);
 
 // tela de resultado final (1 = venceu, 0 = perdeu)
-void tela_resultado(int venceu);
+void tela_resultado(int venceu, ResultadoJurados *j);
 
 // tela de creditos
 void tela_creditos(void);

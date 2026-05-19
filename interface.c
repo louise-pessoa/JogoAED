@@ -272,43 +272,58 @@ void tela_feedback(int acertou) {
 // ==========================================
 // TELA: RESULTADO FINAL
 // ==========================================
-void tela_resultado(int venceu) {
+void tela_resultado(int venceu, ResultadoJurados *j)
+{
     ClearBackground(COR_FUNDO);
-
-    // fundo da cozinha
     DrawRectangle(0, 0, 800, 600, venceu ? (Color){220,255,220,255} : (Color){255,220,220,255});
 
-    // cabecalho tiles decorativos
     for (int i = 0; i < 8; i++) {
         DrawRectangle(i*100, 0, 100, 50, (Color){200,230,255,180});
         DrawRectangleLines(i*100, 0, 100, 50, (Color){150,200,255,200});
     }
 
     if (venceu) {
-        // estrelas
-        DrawText("*", 200, 220, 80, COR_AMARELO);
-        DrawText("*", 340, 190, 100, COR_AMARELO);
-        DrawText("*", 490, 220, 80, COR_AMARELO);
-
-        DrawText("MUITO BOM, MEU FILHO!", 80, 350, 36, COR_TEXTO);
-        DrawText(TextFormat("Pontuacao final: %d", estado.pontuacao), 230, 400, 28, COR_VERDE);
-        DrawText("Voce venceu a competicao!", 200, 440, 24, COR_TEXTO);
+        DrawText("*", 200, 20, 80, COR_AMARELO);
+        DrawText("*", 340, 10, 100, COR_AMARELO);
+        DrawText("*", 490, 20, 80, COR_AMARELO);
+        DrawText("MUITO BOM, MEU FILHO!", 100, 60, 32, COR_TEXTO);
+        DrawText(TextFormat("Pontuacao: %d", estado.pontuacao), 270, 95, 24, COR_VERDE);
     } else {
-        DrawText(":(", 360, 200, 80, COR_VERMELHO);
-        DrawText("Fim de jogo. Tente de novo!", 140, 350, 34, COR_TEXTO);
-        DrawText(TextFormat("Pontuacao final: %d", estado.pontuacao), 230, 400, 28, COR_VERMELHO);
-        DrawText(TextFormat("Meta minima: %d pontos", META_FASE_FINAL), 260, 440, 22, GRAY);
+        DrawText(":(", 360, 20, 60, COR_VERMELHO);
+        DrawText("Fim de jogo. Tente de novo!", 140, 80, 30, COR_TEXTO);
+        DrawText(TextFormat("Pontuacao: %d  (meta: %d)", estado.pontuacao, META_FASE_FINAL),
+                 160, 115, 22, COR_VERMELHO);
     }
 
-    // rodape
-    DrawRectangle(0, 530, 800, 70, COR_BARRA_FUNDO);
-    DrawText("*", 60, 548, 28, COR_AMARELO);
-    int tw = MeasureText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!", 22);
-    DrawText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!",
-             (800-tw)/2, 550, 22, COR_AMARELO);
-    DrawText("*", 720, 548, 28, COR_AMARELO);
+    /* Painel dos jurados */
+    if (j != NULL) {
+        /* Fundo do painel */
+        DrawRectangleRounded((Rectangle){20, 135, 760, 355}, 0.05f, 8, (Color){255,255,255,220});
+        DrawText("JURI DA FASE FINAL", 280, 145, 24, COR_TEXTO);
+        DrawText(TextFormat("Media: %.1f / 10", j->media_final), 320, 172, 20,
+                 j->media_final >= 7 ? COR_VERDE : COR_VERMELHO);
 
-    DrawText("[ENTER] Jogar novamente  [ESC] Menu", 220, 575, 18, WHITE);
+        /* Ariano Suassuna */
+        DrawRectangleRounded((Rectangle){25, 200, 750, 85}, 0.1f, 8, (Color){255,230,180,255});
+        DrawText(TextFormat("Ariano Suassuna   %.1f/10", j->nota_ariano), 35, 208, 20, COR_TEXTO);
+        DrawText(j->comentario_ariano, 35, 232, 17, DARKGRAY);
+
+        /* Clarice Lispector */
+        DrawRectangleRounded((Rectangle){25, 292, 750, 85}, 0.1f, 8, (Color){210,230,255,255});
+        DrawText(TextFormat("Clarice Lispector   %.1f/10", j->nota_clarice), 35, 300, 20, COR_TEXTO);
+        DrawText(j->comentario_clarice, 35, 324, 17, DARKGRAY);
+
+        /* Chico Science */
+        DrawRectangleRounded((Rectangle){25, 384, 750, 85}, 0.1f, 8, (Color){210,255,220,255});
+        DrawText(TextFormat("Chico Science   %.1f/10", j->nota_chico), 35, 392, 20, COR_TEXTO);
+        DrawText(j->comentario_chico, 35, 416, 17, DARKGRAY);
+    }
+
+    DrawRectangle(0, 498, 800, 102, COR_BARRA_FUNDO);
+    int tw = MeasureText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!", 20);
+    DrawText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!",
+             (800-tw)/2, 508, 20, COR_AMARELO);
+    DrawText("[ENTER] Jogar novamente  [ESC] Menu", 220, 540, 18, WHITE);
 }
 
 // ==========================================

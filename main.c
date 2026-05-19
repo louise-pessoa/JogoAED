@@ -3,6 +3,10 @@
 #include "jogo.h"
 #include "interface.h"
 #include "receitas.h"
+#include "groq.h"
+
+static ResultadoJurados jurados;
+static int jurados_prontos = 0;
 
 int main(void) {
     iniciar_jogo();
@@ -17,7 +21,13 @@ int main(void) {
         if (IsKeyPressed(KEY_THREE)) tela_atual = TELA_INGREDIENTES;
         if (IsKeyPressed(KEY_FIVE))  tela_atual = TELA_PILHA;
         if (IsKeyPressed(KEY_SIX))   tela_atual = TELA_FEEDBACK;
-        if (IsKeyPressed(KEY_SEVEN)) tela_atual = TELA_RESULTADO;
+        if (IsKeyPressed(KEY_SEVEN)) {
+            if (!jurados_prontos) {
+                jurados = avaliar_com_jurados(estado);
+                jurados_prontos = 1;
+            }
+            tela_atual = TELA_RESULTADO;
+        }
         if (IsKeyPressed(KEY_EIGHT)) tela_atual = TELA_CREDITOS;
 
         BeginDrawing();
@@ -39,7 +49,7 @@ int main(void) {
                 tela_feedback(1);
                 break;
             case TELA_RESULTADO:
-                tela_resultado(verificar_vitoria());
+                tela_resultado(verificar_vitoria(), &jurados);
                 break;
             case TELA_CREDITOS:
                 tela_creditos();
