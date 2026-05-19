@@ -1,5 +1,5 @@
 #include "pilha.h"
-#include "receitas.h"
+#include "../receitas.h"
 #include <stdlib.h>
 #include <string.h>
 
