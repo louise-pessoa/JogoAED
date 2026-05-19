@@ -58,9 +58,9 @@ void resetar_partida(void) {
     estado.passos_acertados  = 0;   
     estado.passos_total      = 0;  
     _inicio_timer           = 0;
-    jurados_prontos = 0;
+    //jurados_prontos = 0;
 
-    pilha_esvaziar();
+    //pilha_esvaziar();
 
     printf("[SISTEMA] Partida resetada. Pontuacao: %d\n", PONTUACAO_INICIAL);
 }
