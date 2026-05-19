@@ -7,17 +7,17 @@
 #include "receitas.h"
 
 // ==========================================
-// CORES DO PROJETO (estilo comida de mainha)
+// CORES DO PROJETO
 // ==========================================
-#define COR_FUNDO       (Color){255, 243, 210, 255}  // amarelo claro
-#define COR_AZUL        (Color){30, 100, 200, 255}   // azul vibrante
-#define COR_VERMELHO    (Color){220, 50, 50, 255}    // vermelho
-#define COR_VERDE       (Color){50, 160, 80, 255}    // verde
-#define COR_AMARELO     (Color){255, 200, 0, 255}    // amarelo botao
-#define COR_LARANJA     (Color){255, 140, 0, 255}    // laranja
-#define COR_TEXTO       (Color){60, 30, 10, 255}     // marrom escuro
-#define COR_BRANCO      WHITE
-#define COR_BARRA_FUNDO (Color){30, 60, 140, 255}    // azul escuro barra
+#define COR_FUNDO (Color){255, 243, 210, 255}  // amarelo claro
+#define COR_AZUL (Color){30, 100, 200, 255}    // azul vibrante
+#define COR_VERMELHO (Color){220, 50, 50, 255} // vermelho
+#define COR_VERDE (Color){50, 160, 80, 255}    // verde
+#define COR_AMARELO (Color){255, 200, 0, 255}  // amarelo botao
+#define COR_LARANJA (Color){255, 140, 0, 255}  // laranja
+#define COR_TEXTO (Color){60, 30, 10, 255}     // marrom escuro
+#define COR_BRANCO WHITE
+#define COR_BARRA_FUNDO (Color){30, 60, 140, 255} // azul escuro barra
 
 // ==========================================
 // UTILITARIOS
