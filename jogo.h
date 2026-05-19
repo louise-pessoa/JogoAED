@@ -27,6 +27,7 @@ typedef enum {
     TELA_RECEITAS,
     TELA_INGREDIENTES,
     TELA_CATCHER,
+    TELA_ORDENACAO,       // insertion sort animado dos ingredientes coletados
     TELA_PILHA,           // execucao da receita (cozinhar)
     TELA_FEEDBACK,
     TELA_RESULTADO,
@@ -36,6 +37,7 @@ typedef enum {
 // estado global definido em jogo.c
 extern EstadoJogo estado;
 extern Receita *receitas_disponiveis;
+extern Receita *receita_selecionada;  // receita escolhida pelo jogador
 extern EstadoTela tela_atual;
 
 // funcoes publicas

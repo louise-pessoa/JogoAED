@@ -89,7 +89,8 @@ void tela_menu(void) {
     desenhar_botao(655, 290, 120, 55, COR_AZUL,     "Colecao");
 
     // instrucao
-    DrawText("Pressione [1] Receitas  [2] Cozinha  [3] Creditos  [ESC] Sair", 60, 370, 17, COR_TEXTO);
+    DrawText("[2] Comecar (escolher receita)    [8] Creditos    [F11] Tela cheia",
+             80, 370, 17, COR_TEXTO);
 
     // pontuacao atual
     DrawText(TextFormat("Pontuacao: %d", estado.pontuacao), 50, 420, 22, COR_TEXTO);
@@ -122,11 +123,16 @@ void tela_receitas(Receita *lista) {
         int i = 0;
         int y = 120;
         while (aux != NULL && i < 8) {
+            // destaca a receita selecionada
+            int eh_sel = (receita_selecionada == aux);
+            if (eh_sel) {
+                DrawRectangleRounded((Rectangle){46, y - 4, 428, 56}, 0.3f, 8, COR_AMARELO);
+            }
             // card da receita
             DrawRectangleRounded((Rectangle){50, y, 420, 48}, 0.3f, 8, cores[i]);
-            DrawText(aux->nome, 70, y + 8, 20, WHITE);
+            DrawText(TextFormat("[%d] %s", i + 1, aux->nome), 70, y + 8, 20, WHITE);
             DrawText(TextFormat("Dif: %d", aux->dificuldade), 370, y + 8, 18, WHITE);
-            DrawText("** **", 70, y + 28, 14, COR_AMARELO);
+            DrawText(TextFormat("%d passos", aux->n_passos_jog), 70, y + 28, 14, COR_AMARELO);
             aux = aux->prox;
             y += 56;
             i++;
@@ -135,14 +141,29 @@ void tela_receitas(Receita *lista) {
 
     // lado direito - vovo
     DrawRectangleRounded((Rectangle){510, 70, 260, 470}, 0.05f, 8, (Color){255, 235, 180, 255});
-    DrawText("Escolha uma", 530, 120, 20, COR_TEXTO);
-    DrawText("receita para", 530, 145, 20, COR_TEXTO);
-    DrawText("cozinhar!", 530, 170, 20, COR_TEXTO);
+    DrawText("Escolha uma", 530, 100, 20, COR_TEXTO);
+    DrawText("receita para", 530, 125, 20, COR_TEXTO);
+    DrawText("cozinhar!", 530, 150, 20, COR_TEXTO);
+
+    if (receita_selecionada != NULL) {
+        DrawRectangleRounded((Rectangle){520, 200, 240, 110}, 0.2f, 8, COR_VERDE);
+        DrawText("Selecionada:", 535, 210, 16, WHITE);
+        DrawText(receita_selecionada->nome, 535, 235, 18, WHITE);
+        DrawText(TextFormat("Dif: %d | %d min",
+                            receita_selecionada->dificuldade,
+                            receita_selecionada->tempo),
+                 535, 262, 14, WHITE);
+        DrawText("[ENTER] Continuar", 535, 285, 14, COR_AMARELO);
+    } else {
+        DrawText("(nenhuma selecionada)", 530, 215, 16, GRAY);
+    }
 
     // instrucoes
-    DrawText("[1-8] Selecionar  [B] Voltar", 530, 380, 16, COR_TEXTO);
+    DrawText("[1-3] Selecionar", 530, 380, 16, COR_TEXTO);
+    DrawText("[ENTER] Continuar", 530, 405, 16, COR_TEXTO);
+    DrawText("[1] Menu", 530, 430, 16, COR_TEXTO);
 
-    desenhar_rodape("[1-8] Selecionar receita  |  [ESC] Voltar ao menu");
+    desenhar_rodape("[1-3] Selecionar  |  [ENTER] Continuar para o catcher");
 }
 
 // ==========================================
@@ -153,7 +174,10 @@ void tela_ingredientes(Receita *receita) {
     desenhar_cabecalho();
 
     if (receita == NULL) {
-        DrawText("Receita invalida.", 300, 300, 24, COR_VERMELHO);
+        DrawText("Nenhuma receita selecionada.", 220, 280, 24, COR_VERMELHO);
+        DrawText("Volte ao menu de receitas e escolha uma.",
+                 170, 320, 20, COR_TEXTO);
+        desenhar_rodape("[2] Voltar para receitas");
         return;
     }
 
@@ -163,41 +187,37 @@ void tela_ingredientes(Receita *receita) {
     DrawText(receita->nome, (800 - tw)/2, 85, 28, WHITE);
 
     // balao de instrucao
-    DrawRectangleRounded((Rectangle){100, 140, 500, 120}, 0.1f, 8, WHITE);
-    DrawRectangleRoundedLines((Rectangle){100, 140, 500, 120}, 0.1f, 8, COR_AZUL);
-    DrawText("Proximo passo!", 200, 155, 24, COR_VERDE);
-    DrawText("Siga a ordem dos ingredientes.", 130, 190, 20, COR_TEXTO);
-    DrawText("Aperte ENTER quando indicado.", 130, 215, 18, GRAY);
+    DrawRectangleRounded((Rectangle){100, 140, 600, 110}, 0.1f, 8, WHITE);
+    DrawRectangleRoundedLines((Rectangle){100, 140, 600, 110}, 0.1f, 8, COR_AZUL);
+    DrawText("Esses sao os ingredientes que voce precisa!", 120, 155, 20, COR_VERDE);
+    DrawText("No proximo passo voce vai pega-los na cesta", 120, 185, 18, COR_TEXTO);
+    DrawText("antes do tempo acabar. Cuidado com os errados!", 120, 210, 18, COR_TEXTO);
 
     // lista de ingredientes
-    DrawText("Ingredientes:", 50, 280, 22, COR_TEXTO);
+    DrawText("Ingredientes:", 50, 270, 22, COR_TEXTO);
     if (receita->ingredientes == NULL) {
-        DrawText("(nenhum ingrediente cadastrado)", 70, 310, 18, GRAY);
+        DrawText("(nenhum ingrediente cadastrado)", 70, 305, 18, GRAY);
     } else {
         Ingrediente *aux = receita->ingredientes;
-        int i = 0, y = 310;
+        int i = 0, y = 305;
         Color cores[] = {COR_VERMELHO, COR_VERDE, COR_AZUL, COR_LARANJA};
         while (aux != NULL && i < 8) {
-            DrawCircle(65, y + 10, 12, cores[i % 4]);
+            DrawCircle(65, y + 10, 14, cores[i % 4]);
             DrawText(TextFormat("%d", i+1), 60, y + 3, 16, WHITE);
             DrawText(aux->nome, 85, y, 20, COR_TEXTO);
+            DrawText(aux->quantidade, 400, y, 18, GRAY);
             aux = aux->prox;
             y += 30;
             i++;
         }
     }
 
-    // barra de passos na base
-    DrawRectangle(0, 480, 800, 70, COR_AMARELO);
-    DrawText("Passos:", 30, 495, 18, COR_TEXTO);
-    int passos = estado.passos_total > 0 ? estado.passos_total : 5;
-    for (int i = 0; i < passos; i++) {
-        Color c = i < estado.passos_acertados ? COR_VERDE : LIGHTGRAY;
-        DrawCircle(120 + i * 60, 515, 20, c);
-        DrawText(TextFormat("%d", i+1), 113 + i * 60, 507, 18, WHITE);
-    }
+    // dica
+    DrawRectangleRounded((Rectangle){50, 480, 700, 60}, 0.3f, 8, COR_AMARELO);
+    DrawText("Aperte [ENTER] para entrar no minigame da cesta!",
+             80, 498, 22, COR_TEXTO);
 
-    desenhar_rodape("[ENTER] Comecar a cozinhar  |  [B] Voltar");
+    desenhar_rodape("[ENTER] Ir para o catcher  |  [2] Voltar para receitas");
 }
 
 // ==========================================

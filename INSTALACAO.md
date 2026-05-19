@@ -36,8 +36,17 @@ Se os dois comandos listarem os arquivos, o Raylib está instalado.
 Dentro da pasta do projeto:
 
 ```bash
-gcc main.c jogo.c receitas.c estruturas/pilha.c -o jogo.exe \
+gcc main.c jogo.c receitas.c interface.c catcher.c ordenacao.c cozinhar.c \
+    estruturas/pilha.c -o jogo.exe \
     -lraylib -lm -lpthread -ldl -lrt -lX11
+```
+
+No Windows com w64devkit/MinGW:
+
+```bash
+gcc main.c jogo.c receitas.c interface.c catcher.c ordenacao.c cozinhar.c \
+    estruturas/pilha.c -o jogo.exe -I. \
+    -lraylib -lopengl32 -lgdi32 -lwinmm
 ```
 
 ## 5. Executar

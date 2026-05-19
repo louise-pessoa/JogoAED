@@ -1,27 +1,156 @@
 #include <stdio.h>
+#include <math.h>
 #include "raylib.h"
 #include "jogo.h"
 #include "interface.h"
 #include "receitas.h"
+#include "catcher.h"
+#include "ordenacao.h"
+#include "cozinhar.h"
+
+#define LARG_VIRTUAL 800
+#define ALT_VIRTUAL  600
+
+// alterna entre janela e tela cheia, ajustando o tamanho da janela
+// pra casar com a resolucao do monitor (evita esticar feio).
+static void alternar_fullscreen(void) {
+    int monitor = GetCurrentMonitor();
+    int mw = GetMonitorWidth(monitor);
+    int mh = GetMonitorHeight(monitor);
+
+    if (!IsWindowFullscreen()) {
+        SetWindowSize(mw, mh);
+        ToggleFullscreen();
+    } else {
+        ToggleFullscreen();
+        SetWindowSize(LARG_VIRTUAL, ALT_VIRTUAL);
+        SetWindowPosition((mw - LARG_VIRTUAL) / 2, (mh - ALT_VIRTUAL) / 2);
+    }
+}
+
+// Receita selecionada via tecla 1-3 dentro da tela de receitas.
+static void atualizar_selecao_receitas(void) {
+    if (tela_atual != TELA_RECEITAS) return;
+
+    if (IsKeyPressed(KEY_ONE)) {
+        receita_selecionada = buscar_receita_idx(receitas_disponiveis, 1);
+        return; // tecla 1 tambem volta pro menu; mas se ja estamos em receitas,
+                // priorizamos a selecao
+    }
+    if (IsKeyPressed(KEY_TWO))   receita_selecionada = buscar_receita_idx(receitas_disponiveis, 2);
+    if (IsKeyPressed(KEY_THREE)) receita_selecionada = buscar_receita_idx(receitas_disponiveis, 3);
+
+    if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT) &&
+        receita_selecionada != NULL) {
+        tela_atual = TELA_INGREDIENTES;
+    }
+}
 
 int main(void) {
     iniciar_jogo();
     integrar_modulos();
 
-    InitWindow(800, 600, "Receitas de Mainha");
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+    InitWindow(LARG_VIRTUAL, ALT_VIRTUAL, "Receitas de Mainha");
     SetTargetFPS(60);
 
+    RenderTexture2D alvo = LoadRenderTexture(LARG_VIRTUAL, ALT_VIRTUAL);
+    SetTextureFilter(alvo.texture, TEXTURE_FILTER_BILINEAR);
+
     while (!WindowShouldClose()) {
-        if (IsKeyPressed(KEY_ONE))   tela_atual = TELA_MENU;
-        if (IsKeyPressed(KEY_TWO))   tela_atual = TELA_RECEITAS;
-        if (IsKeyPressed(KEY_THREE)) tela_atual = TELA_INGREDIENTES;
-        if (IsKeyPressed(KEY_FIVE))  tela_atual = TELA_PILHA;
-        if (IsKeyPressed(KEY_SIX))   tela_atual = TELA_FEEDBACK;
-        if (IsKeyPressed(KEY_SEVEN)) tela_atual = TELA_RESULTADO;
-        if (IsKeyPressed(KEY_EIGHT)) tela_atual = TELA_CREDITOS;
+        // ---- alterna fullscreen ----
+        if (IsKeyPressed(KEY_F11) ||
+            (IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_ENTER))) {
+            alternar_fullscreen();
+        }
 
-        BeginDrawing();
+        // ---- transforma coordenadas do mouse para o canvas virtual ----
+        float sw = (float)GetScreenWidth();
+        float sh = (float)GetScreenHeight();
+        float escala = fminf(sw / LARG_VIRTUAL, sh / ALT_VIRTUAL);
+        float vw = LARG_VIRTUAL * escala;
+        float vh = ALT_VIRTUAL  * escala;
+        float vx = (sw - vw) * 0.5f;
+        float vy = (sh - vh) * 0.5f;
+        SetMouseOffset((int)(-vx), (int)(-vy));
+        SetMouseScale(1.0f / escala, 1.0f / escala);
 
+        // ---- navegacao livre (so quando nao estamos em telas jogaveis) ----
+        if (tela_atual != TELA_CATCHER &&
+            tela_atual != TELA_ORDENACAO &&
+            tela_atual != TELA_PILHA) {
+            if (IsKeyPressed(KEY_ONE) && tela_atual != TELA_RECEITAS)
+                tela_atual = TELA_MENU;
+            if (IsKeyPressed(KEY_TWO))   tela_atual = TELA_RECEITAS;
+            if (IsKeyPressed(KEY_EIGHT)) tela_atual = TELA_CREDITOS;
+        }
+
+        // ---- logica de cada tela ----
+        switch (tela_atual) {
+            case TELA_RECEITAS:
+                atualizar_selecao_receitas();
+                break;
+
+            case TELA_INGREDIENTES:
+                if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
+                    catcher.iniciado = 0;
+                    catcher.terminou = 0;
+                    tela_atual = TELA_CATCHER;
+                }
+                if (IsKeyPressed(KEY_B)) tela_atual = TELA_RECEITAS;
+                break;
+
+            case TELA_CATCHER:
+                if (!catcher.iniciado &&
+                    IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
+                    if (receita_selecionada != NULL) {
+                        catcher_iniciar(receita_selecionada);
+                    }
+                }
+                if (catcher.terminou) {
+                    if (IsKeyPressed(KEY_R)) {
+                        catcher_iniciar(receita_selecionada);
+                    } else if (IsKeyPressed(KEY_ENTER) &&
+                               !IsKeyDown(KEY_LEFT_ALT)) {
+                        if (catcher.venceu) {
+                            ordenacao_iniciar(receita_selecionada);
+                            tela_atual = TELA_ORDENACAO;
+                        } else {
+                            tela_atual = TELA_RESULTADO;
+                        }
+                    }
+                }
+                break;
+
+            case TELA_ORDENACAO:
+                if (ordenacao_terminou() &&
+                    IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
+                    cozinhar_iniciar(receita_selecionada);
+                    tela_atual = TELA_PILHA;
+                }
+                break;
+
+            case TELA_PILHA:
+                if (cozinhar.terminou &&
+                    IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
+                    tela_atual = TELA_RESULTADO;
+                }
+                break;
+
+            case TELA_RESULTADO:
+                if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
+                    resetar_partida();
+                    receita_selecionada = NULL;
+                    tela_atual = TELA_MENU;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        // ---- desenha no canvas virtual ----
+        BeginTextureMode(alvo);
         switch (tela_atual) {
             case TELA_MENU:
                 tela_menu();
@@ -30,10 +159,16 @@ int main(void) {
                 tela_receitas(receitas_disponiveis);
                 break;
             case TELA_INGREDIENTES:
-                tela_ingredientes(receitas_disponiveis);
+                tela_ingredientes(receita_selecionada);
+                break;
+            case TELA_CATCHER:
+                tela_catcher();
+                break;
+            case TELA_ORDENACAO:
+                tela_ordenacao();
                 break;
             case TELA_PILHA:
-                tela_pilha("Execute o proximo passo!", estado.passos_acertados + 1, estado.passos_total, tempo_decorrido());
+                tela_cozinhar();
                 break;
             case TELA_FEEDBACK:
                 tela_feedback(1);
@@ -48,10 +183,27 @@ int main(void) {
                 ClearBackground(RAYWHITE);
                 break;
         }
+        EndTextureMode();
 
+        // ---- escala o canvas pra janela mantendo aspect ratio ----
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        DrawTexturePro(
+            alvo.texture,
+            (Rectangle){ 0, 0, (float)LARG_VIRTUAL, -(float)ALT_VIRTUAL },
+            (Rectangle){ vx, vy, vw, vh },
+            (Vector2){ 0, 0 }, 0.0f, WHITE
+        );
+
+        if (!IsWindowFullscreen()) {
+            DrawText("[F11] Tela cheia", 10, GetScreenHeight() - 22, 14,
+                     (Color){255, 255, 255, 160});
+        }
         EndDrawing();
     }
 
+    UnloadRenderTexture(alvo);
     liberar_receitas(receitas_disponiveis);
     CloseWindow();
     return 0;

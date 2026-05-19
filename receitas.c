@@ -17,7 +17,9 @@ Receita *_criar_no_receita(const char *nome, int dificuldade,int tempo, int pont
     novo->passo_acao[0]  = '\0';
     novo->ingrediente[0] = '\0';
 
-    novo->passos       = NULL;  
+    novo->n_passos_jog = 0;
+
+    novo->passos       = NULL;
     novo->prox         = NULL;
     return novo;
 }
@@ -106,6 +108,22 @@ void definir_passo(Receita *no, const char *acao, const char *ing) {
     no->passo_acao[sizeof(no->passo_acao) - 1] = '\0';
     strncpy(no->ingrediente, ing, sizeof(no->ingrediente) - 1);
     no->ingrediente[sizeof(no->ingrediente) - 1] = '\0';
+}
+
+void adicionar_passo_jogavel(Receita *receita, const char *acao,
+                             const char *ingrediente, const char *teclas,
+                             int tempo_limite) {
+    if (receita == NULL) return;
+    if (receita->n_passos_jog >= MAX_PASSOS_JOGAVEIS) return;
+
+    PassoJogavel *p = &receita->passos_jog[receita->n_passos_jog++];
+    strncpy(p->acao, acao, sizeof(p->acao) - 1);
+    p->acao[sizeof(p->acao) - 1] = '\0';
+    strncpy(p->ingrediente, ingrediente, sizeof(p->ingrediente) - 1);
+    p->ingrediente[sizeof(p->ingrediente) - 1] = '\0';
+    strncpy(p->teclas, teclas, sizeof(p->teclas) - 1);
+    p->teclas[sizeof(p->teclas) - 1] = '\0';
+    p->tempo_limite = tempo_limite;
 }
 
 // Lista de ingredientes por receita

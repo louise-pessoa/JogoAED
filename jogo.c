@@ -12,6 +12,8 @@ static clock_t _inicio_timer;
 EstadoJogo estado;
 // lista global de receitas disponiveis no jogo
 Receita *receitas_disponiveis = NULL;
+// receita escolhida pelo jogador no menu de receitas
+Receita *receita_selecionada = NULL;
 // tela ativa no momento
 EstadoTela tela_atual = TELA_MENU;
 
@@ -130,7 +132,36 @@ void integrar_modulos(void) {
     inserir_ingrediente(bolo, "Goiabada",         "300g");
     inserir_ingrediente(bolo, "Acucar",           "200g");
 
-    // TODO: passos das receitas - alinhar design com Mateus
+    // === passos jogaveis ===
+    // tapioca: hidrata, mistura coco, derrete manteiga
+    adicionar_passo_jogavel(tapioca, "Hidrate a tapioca peneirando",
+                            "Tapioca granulada", "SSSS", 12);
+    adicionar_passo_jogavel(tapioca, "Misture o coco ralado",
+                            "Coco ralado", "ADAD", 10);
+    adicionar_passo_jogavel(tapioca, "Derreta a manteiga na frigideira",
+                            "Manteiga", "SPACE", 8);
+
+    // sururu: limpa, corta cebola/coentro, refoga, finaliza com leite de coco
+    adicionar_passo_jogavel(sururu, "Lave bem o sururu",
+                            "Sururu", "WSWS", 12);
+    adicionar_passo_jogavel(sururu, "Pique a cebola",
+                            "Cebola", "QEQE", 10);
+    adicionar_passo_jogavel(sururu, "Pique o coentro",
+                            "Coentro", "QWE", 10);
+    adicionar_passo_jogavel(sururu, "Refogue tudo com leite de coco",
+                            "Leite de coco", "WASDW", 15);
+
+    // bolo de rolo: cremeia manteiga+acucar, ovos, farinha, recheia
+    adicionar_passo_jogavel(bolo, "Bata manteiga com acucar",
+                            "Manteiga", "WASDW", 12);
+    adicionar_passo_jogavel(bolo, "Adicione o acucar e bata",
+                            "Acucar", "ASDF", 10);
+    adicionar_passo_jogavel(bolo, "Acrescente os ovos um a um",
+                            "Ovos", "SPACE", 8);
+    adicionar_passo_jogavel(bolo, "Misture a farinha de trigo",
+                            "Farinha de trigo", "QWERTY", 14);
+    adicionar_passo_jogavel(bolo, "Espalhe a goiabada e enrole",
+                            "Goiabada", "DDDD", 12);
 
     printf("[SISTEMA] Modulos integrados. 3 receitas disponiveis.\n");
 }
