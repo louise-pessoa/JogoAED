@@ -31,9 +31,24 @@ static void alternar_fullscreen(void) {
 static void atualizar_selecao_receitas(void) {
     if (tela_atual != TELA_RECEITAS) return;
 
-    if (IsKeyPressed(KEY_ONE))   receita_selecionada = buscar_receita_idx(receitas_disponiveis, 1);
-    if (IsKeyPressed(KEY_TWO))   receita_selecionada = buscar_receita_idx(receitas_disponiveis, 2);
-    if (IsKeyPressed(KEY_THREE)) receita_selecionada = buscar_receita_idx(receitas_disponiveis, 3);
+    // contar total de receitas na lista
+    int total = 0;
+    { Receita *r = receitas_disponiveis; while (r) { total++; r = r->prox; } }
+    if (total == 0) return;
+
+    // descobrir indice atual (1-based); 0 = nenhuma
+    int idx = 0;
+    { int k = 1; Receita *r = receitas_disponiveis;
+      while (r) { if (r == receita_selecionada) { idx = k; break; } k++; r = r->prox; } }
+    if (idx == 0) idx = 1; // seleciona primeira se nada selecionado
+
+    if (IsKeyPressed(KEY_ONE))   idx = 1;
+    if (IsKeyPressed(KEY_TWO))   idx = 2;
+    if (IsKeyPressed(KEY_THREE)) idx = 3;
+    if (IsKeyPressed(KEY_DOWN))  idx = (idx % total) + 1;
+    if (IsKeyPressed(KEY_UP))    idx = (idx - 2 + total) % total + 1;
+
+    receita_selecionada = buscar_receita_idx(receitas_disponiveis, idx);
 
     if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT) &&
         receita_selecionada != NULL) {

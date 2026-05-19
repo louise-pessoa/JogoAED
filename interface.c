@@ -145,9 +145,10 @@ void tela_receitas(Receita *lista) {
             else
                 DrawText(TextFormat("%d passos", aux->n_passos_jog), 70, y + 28, 14, COR_AMARELO);
 
-            // seleciona ao clicar
+            // clique: seleciona e avanca direto para ingredientes
             if (hovered && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 receita_selecionada = aux;
+                tela_atual = TELA_INGREDIENTES;
             }
 
             aux = aux->prox;
@@ -176,11 +177,12 @@ void tela_receitas(Receita *lista) {
     }
 
     // instrucoes
-    DrawText("[1-3] Selecionar", 530, 380, 16, COR_TEXTO);
-    DrawText("[ENTER] Continuar", 530, 405, 16, COR_TEXTO);
-    DrawText("[1] Menu", 530, 430, 16, COR_TEXTO);
+    DrawText("[Setas] Navegar", 530, 380, 16, COR_TEXTO);
+    DrawText("[1-3] Selecionar", 530, 400, 16, COR_TEXTO);
+    DrawText("[ENTER] Continuar", 530, 420, 16, COR_TEXTO);
+    DrawText("[1] Menu", 530, 440, 16, COR_TEXTO);
 
-    desenhar_rodape("[1-3] Selecionar  |  [ENTER] Continuar para o catcher");
+    desenhar_rodape("[Setas/1-3] Selecionar  |  [ENTER] ou Clique para continuar");
 }
 
 // ==========================================
