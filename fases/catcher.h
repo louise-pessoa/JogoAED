@@ -77,4 +77,10 @@ int  catcher_terminou(void);
 // retorna 1 se o jogador coletou todos os ingredientes
 int  catcher_venceu(void);
 
+// carrega sprites do catcher (chamar uma vez depois do InitWindow)
+void catcher_carregar_sprites(void);
+
+// libera sprites do catcher (chamar uma vez antes do CloseWindow)
+void catcher_descarregar_sprites(void);
+
 #endif
