@@ -11,7 +11,7 @@
 #define GROQ_MODEL      "llama-3.3-70b-versatile"
 #define GROQ_MAX_TOKENS 300
 #define BUFFER_SIZE     8192
-#define BODY_SIZE       8192
+#define BODY_SIZE       16384
 
 /* -------------------------------------------------------------------------
  * Lê um arquivo .env e injeta as variáveis no ambiente do processo.
