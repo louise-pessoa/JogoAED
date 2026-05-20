@@ -56,9 +56,55 @@ O jogo utiliza a **API da OpenAI** para simular os jurados da competição final
 
 ---
 
+## 📁 Estrutura de Pastas
+
+```
+JogoAED/
+├── main.c              # Entry point: loop principal, janela, transições de tela
+├── jogo.h / jogo.c     # Estado global: pontuação, timer, penalidades
+│
+├── dados/              # Estruturas de dados (núcleo da disciplina AED)
+│   ├── pilha.h/c       # Pilha LIFO — controla os passos da receita
+│   └── receitas.h/c    # Listas encadeadas de receitas e ingredientes
+│
+├── fases/              # Os três minijogos em sequência
+│   ├── catcher.h/c     # Fase 1 — coleta de ingredientes (25s)
+│   ├── ordenacao.h/c   # Fase 2 — Insertion Sort animado
+│   └── cozinhar.h/c    # Fase 3 — execução da pilha de passos
+│
+├── ui/                 # Renderização Raylib (telas, botões, cores)
+│   └── interface.h/c
+│
+├── api/                # Integração com serviço externo
+│   └── groq.h/c        # Jurados IA via Groq API (LLaMA 3.1)
+│
+└── docs/               # Documentação do projeto
+    ├── README.md
+    ├── CONTEXT.md
+    └── INSTALACAO.md
+```
+
+---
+
 ## 🚀 Como compilar e executar
 
+**Linux/WSL:**
+```bash
+gcc main.c jogo.c dados/receitas.c dados/pilha.c \
+    ui/interface.c fases/catcher.c fases/ordenacao.c fases/cozinhar.c \
+    api/groq.c -o jogo -I. \
+    -lraylib -lm -lpthread -ldl -lrt -lX11 -lcurl
+```
 
+**Windows (MinGW):**
+```bash
+gcc main.c jogo.c dados/receitas.c dados/pilha.c \
+    ui/interface.c fases/catcher.c fases/ordenacao.c fases/cozinhar.c \
+    api/groq.c -o jogo.exe -I. \
+    -lraylib -lopengl32 -lgdi32 -lwinmm -lcurl
+```
+
+> A variável de ambiente `GROQ_API_KEY` precisa estar definida para a fase dos jurados funcionar.
 
 ---
 

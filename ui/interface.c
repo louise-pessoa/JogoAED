@@ -3,8 +3,8 @@
 #include <string.h>
 #include "raylib.h"
 #include "interface.h"
-#include "jogo.h"
-#include "receitas.h"
+#include "../jogo.h"
+#include "../dados/receitas.h"
 
 // ==========================================
 // CORES DO PROJETO
@@ -26,7 +26,7 @@
 // desenha botao colorido com texto centralizado
 static void desenhar_botao(int x, int y, int w, int h, Color cor, const char *texto) {
     DrawRectangleRounded((Rectangle){x, y, w, h}, 0.4f, 8, cor);
-    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.4f, 8, WHITE);
+    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.4f, 8, 2.0f, WHITE);
     int tam = 22;
     int tw = MeasureText(texto, tam);
     DrawText(texto, x + (w - tw) / 2, y + (h - tam) / 2, tam, WHITE);
@@ -83,10 +83,14 @@ void tela_menu(void) {
     DrawText("*", 590, 200, 20, COR_LARANJA);
 
     // botoes principais
-    desenhar_botao(80,  290, 180, 55, COR_VERMELHO, "Receitas");
-    desenhar_botao(290, 290, 180, 55, COR_VERDE,    "Cozinha");
-    desenhar_botao(500, 290, 130, 55, COR_LARANJA,  "Loja");
-    desenhar_botao(655, 290, 120, 55, COR_AZUL,     "Colecao");
+    desenhar_botao(200, 290, 180, 55, COR_VERMELHO, "Receitas");
+    desenhar_botao(430, 290, 160, 55, COR_AZUL,     "Colecao");
+
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 m = GetMousePosition();
+        if (CheckCollisionPointRec(m, (Rectangle){200, 290, 180, 55})) tela_atual = TELA_RECEITAS;
+        if (CheckCollisionPointRec(m, (Rectangle){430, 290, 160, 55})) tela_atual = TELA_CREDITOS;
+    }
 
     // instrucao
     DrawText("[2] Comecar (escolher receita)    [8] Creditos    [F11] Tela cheia",
@@ -207,10 +211,10 @@ void tela_ingredientes(Receita *receita) {
 
     // balao de instrucao
     DrawRectangleRounded((Rectangle){100, 140, 600, 110}, 0.1f, 8, WHITE);
-    DrawRectangleRoundedLines((Rectangle){100, 140, 600, 110}, 0.1f, 8, COR_AZUL);
-    DrawText("Esses sao os ingredientes que voce precisa!", 120, 155, 20, COR_VERDE);
-    DrawText("No proximo passo voce vai pega-los na cesta", 120, 185, 18, COR_TEXTO);
-    DrawText("antes do tempo acabar. Cuidado com os errados!", 120, 210, 18, COR_TEXTO);
+    DrawRectangleRoundedLines((Rectangle){100, 140, 600, 110}, 0.1f, 8, 2.0f, COR_AZUL);
+    DrawText("Memorize os ingredientes abaixo!", 120, 155, 20, COR_VERDE);
+    DrawText("Eles vao cair do ceu em 25 segundos — use [<-][->] para", 120, 182, 17, COR_TEXTO);
+    DrawText("mover a cesta e coletar so os certos. Errados custam pontos!", 120, 207, 17, COR_VERMELHO);
 
     // lista de ingredientes
     DrawText("Ingredientes:", 50, 270, 22, COR_TEXTO);
@@ -254,7 +258,7 @@ void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double
 
     // instrucao no topo
     DrawRectangleRounded((Rectangle){100, 20, 600, 60}, 0.3f, 8, (Color){255, 245, 200, 240});
-    DrawRectangleRoundedLines((Rectangle){100, 20, 600, 60}, 0.3f, 8, COR_LARANJA);
+    DrawRectangleRoundedLines((Rectangle){100, 20, 600, 60}, 0.3f, 8, 2.0f, COR_LARANJA);
     DrawText("*", 115, 35, 22, COR_AMARELO);
     int tw = MeasureText(passo_atual, 22);
     DrawText(passo_atual, (800 - tw)/2, 35, 22, COR_TEXTO);
@@ -269,7 +273,7 @@ void tela_pilha(const char *passo_atual, int num_passo, int total_passos, double
 
     // balao da vovo com dica
     DrawRectangleRounded((Rectangle){30, 320, 220, 80}, 0.2f, 8, (Color){255,220,230,255});
-    DrawRectangleRoundedLines((Rectangle){30, 320, 220, 80}, 0.2f, 8, (Color){255,150,180,255});
+    DrawRectangleRoundedLines((Rectangle){30, 320, 220, 80}, 0.2f, 8, 2.0f, (Color){255,150,180,255});
     DrawText("Siga a ordem!", 45, 335, 18, COR_TEXTO);
     DrawText("Voce consegue!", 45, 358, 17, COR_TEXTO);
 
@@ -362,7 +366,7 @@ void tela_resultado(int venceu, ResultadoJurados *j)
     int tw = MeasureText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!", 20);
     DrawText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!",
              (800-tw)/2, 508, 20, COR_AMARELO);
-    DrawText("[ENTER] Jogar novamente  [ESC] Menu", 220, 540, 18, WHITE);
+    DrawText("[ESC] Voltar ao menu", 300, 540, 18, WHITE);
 }
 
 // ==========================================

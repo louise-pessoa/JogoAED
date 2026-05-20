@@ -2,7 +2,7 @@
 #define JOGO_H
 
 #include <time.h>
-#include "receitas.h"
+#include "dados/receitas.h"
 
 // constantes do jogo
 #define PONTUACAO_INICIAL      100
@@ -17,8 +17,10 @@ typedef struct {
     int rodada_atual;
     int em_execucao;
     int fase_final_ativa;
-    int passos_acertados;   
+    int passos_acertados;
     int passos_total;
+    int tempo_extra;
+    int erro_passo;
 } EstadoJogo;
 
 // estados de tela do jogo (qual tela esta sendo exibida)
@@ -46,10 +48,9 @@ double tempo_decorrido(void);
 int    tempo_esgotado(int limite);
 void   resetar_partida(void);
 void   iniciar_jogo(void);
-int verificar_vitoria(void);
-void calcular_pontuacao(int acertou, int tempo_gasto, int tempo_limite);
-void _avancar_progresso(void);
-void integrar_modulos(void);
-// funcoes internas nao devem aparecer no .h (_aplicar_penalidade_tempo)
+int    verificar_vitoria(void);
+void   calcular_pontuacao(int acertou, int tempo_gasto, int tempo_limite);
+void   _avancar_progresso(void);
+void   integrar_modulos(void);
 
 #endif

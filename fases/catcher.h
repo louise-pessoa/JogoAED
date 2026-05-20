@@ -2,9 +2,9 @@
 #define CATCHER_H
 
 #include "raylib.h"
-#include "receitas.h"
+#include "../dados/receitas.h"
 
-#define CATCHER_TEMPO_LIMITE    45
+#define CATCHER_TEMPO_LIMITE    25
 #define CATCHER_MAX_ITENS       16
 #define CATCHER_MAX_ALVOS       10
 #define CATCHER_MAX_DISTRATORES 16
@@ -33,6 +33,7 @@ typedef struct {
     IngredienteAlvo alvos[CATCHER_MAX_ALVOS];
     int n_alvos;
     int coletados;
+    int spawnou[CATCHER_MAX_ALVOS];   // 1 se o ingrediente ja apareceu na tela
 
     ItemCaindo itens[CATCHER_MAX_ITENS];
 

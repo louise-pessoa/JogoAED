@@ -1,10 +1,10 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include "groq.h"
+#include "../api/groq.h"
 #include "raylib.h"
-#include "receitas.h"
-#include "jogo.h"
+#include "../dados/receitas.h"
+#include "../jogo.h"
 
 // tela menu principal
 void tela_menu(void);

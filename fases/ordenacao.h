@@ -1,7 +1,7 @@
 #ifndef ORDENACAO_H
 #define ORDENACAO_H
 
-#include "receitas.h"
+#include "../dados/receitas.h"
 
 #define MAX_ORDENACAO 12
 

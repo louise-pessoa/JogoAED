@@ -1,7 +1,7 @@
 #ifndef GROQ_H
 #define GROQ_H
 
-#include "jogo.h"
+#include "../jogo.h"
 
 /* Resultado retornado pelos 3 jurados apos avaliacao via API do Groq */
 typedef struct {

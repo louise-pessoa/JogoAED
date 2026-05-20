@@ -2,13 +2,13 @@
 #include <math.h>
 #include <pthread.h>
 #include "raylib.h"
-#include "groq.h"
+#include "api/groq.h"
 #include "jogo.h"
-#include "interface.h"
-#include "receitas.h"
-#include "catcher.h"
-#include "ordenacao.h"
-#include "cozinhar.h"
+#include "ui/interface.h"
+#include "dados/receitas.h"
+#include "fases/catcher.h"
+#include "fases/ordenacao.h"
+#include "fases/cozinhar.h"
 
 #define LARG_VIRTUAL 800
 #define ALT_VIRTUAL  600
@@ -90,8 +90,19 @@ int main(void) {
 
     RenderTexture2D alvo = LoadRenderTexture(LARG_VIRTUAL, ALT_VIRTUAL);
     SetTextureFilter(alvo.texture, TEXTURE_FILTER_BILINEAR);
+    SetExitKey(0);
 
     while (!WindowShouldClose()) {
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            if (tela_atual == TELA_MENU) break;
+            if (tela_atual == TELA_RESULTADO) {
+                resetar_partida();
+                receita_selecionada = NULL;
+                jurados_prontos     = 0;
+                jurados_solicitados = 0;
+            }
+            tela_atual = TELA_MENU;
+        }
         // ---- alterna fullscreen ----
         if (IsKeyPressed(KEY_F11) ||
             (IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_ENTER))) {
@@ -138,20 +149,15 @@ int main(void) {
 
             case TELA_INGREDIENTES:
                 if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
-                    catcher.iniciado = 0;
-                    catcher.terminou = 0;
-                    tela_atual = TELA_CATCHER;
+                    if (receita_selecionada != NULL) {
+                        catcher_iniciar(receita_selecionada);
+                        tela_atual = TELA_CATCHER;
+                    }
                 }
                 if (IsKeyPressed(KEY_B)) tela_atual = TELA_RECEITAS;
                 break;
 
             case TELA_CATCHER:
-                if (!catcher.iniciado &&
-                    IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
-                    if (receita_selecionada != NULL) {
-                        catcher_iniciar(receita_selecionada);
-                    }
-                }
                 if (catcher.terminou) {
                     if (IsKeyPressed(KEY_R)) {
                         catcher_iniciar(receita_selecionada);
@@ -181,16 +187,6 @@ int main(void) {
                     IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
                     disparar_jurados();
                     tela_atual = TELA_RESULTADO;
-                }
-                break;
-
-            case TELA_RESULTADO:
-                if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
-                    resetar_partida();
-                    receita_selecionada  = NULL;
-                    jurados_prontos      = 0;
-                    jurados_solicitados  = 0;
-                    tela_atual = TELA_MENU;
                 }
                 break;
 
