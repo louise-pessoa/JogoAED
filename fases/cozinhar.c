@@ -111,7 +111,9 @@ void cozinhar_iniciar(Receita *receita) {
     cozinhar.feedback_acerto = 0;
     cozinhar.erros = 0;
     cozinhar.acertos = 0;
-    cozinhar.pontos = estado.pontuacao;
+    cozinhar.pontos         = estado.pontuacao;
+    estado.passos_total     = receita->n_passos_jog;
+    estado.passos_acertados = 0;
     cozinhar.terminou = 0;
     cozinhar.venceu = 0;
     marcar_destacado();
@@ -130,6 +132,7 @@ static void avancar_passo(int acertou) {
     if (acertou) {
         cozinhar.acertos++;
         cozinhar.pontos += 10;
+        _avancar_progresso();
     } else {
         cozinhar.erros++;
         cozinhar.pontos -= 5;

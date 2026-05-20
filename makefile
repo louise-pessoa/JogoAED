@@ -1,6 +1,6 @@
 CC     = gcc
-SRCS   = main.c jogo.c receitas.c estruturas/pilha.c groq.c catcher.c cozinhar.c interface.c ordenacao.c
-TARGET = sabores
+SRCS   = main.c jogo.c dados/receitas.c dados/pilha.c api/groq.c fases/catcher.c fases/cozinhar.c ui/interface.c fases/ordenacao.c
+TARGET = mainha
 
 # Detecta o sistema operacional
 UNAME_S := $(shell uname -s)

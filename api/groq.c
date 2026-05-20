@@ -8,10 +8,73 @@
  * Constantes
  * ---------------------------------------------------------------------- */
 #define GROQ_ENDPOINT   "https://api.groq.com/openai/v1/chat/completions"
-#define GROQ_MODEL      "llama3-70b-8192"
+#define GROQ_MODEL      "llama-3.3-70b-versatile"
 #define GROQ_MAX_TOKENS 300
 #define BUFFER_SIZE     8192
-#define BODY_SIZE       4096
+#define BODY_SIZE       8192
+
+/* -------------------------------------------------------------------------
+ * Lê um arquivo .env e injeta as variáveis no ambiente do processo.
+ * Formato suportado: CHAVE=valor (linhas com # são ignoradas).
+ * Não sobrescreve variáveis já definidas no ambiente.
+ * ---------------------------------------------------------------------- */
+static void carregar_dotenv(const char *caminho)
+{
+    FILE *f = fopen(caminho, "r");
+    if (!f) return;
+
+    char linha[512];
+    while (fgets(linha, sizeof(linha), f)) {
+        char *p = linha;
+        while (*p == ' ' || *p == '\t') p++;
+        if (*p == '#' || *p == '\n' || *p == '\r' || *p == '\0') continue;
+
+        char *eq = strchr(p, '=');
+        if (!eq) continue;
+
+        *eq = '\0';
+        char *chave = p;
+        char *valor = eq + 1;
+
+        /* Remove \n e \r do final do valor */
+        size_t len = strlen(valor);
+        while (len > 0 && (valor[len-1] == '\n' || valor[len-1] == '\r'))
+            valor[--len] = '\0';
+
+        /* Remove aspas simples ou duplas ao redor do valor */
+        if (len >= 2 &&
+            ((valor[0] == '"'  && valor[len-1] == '"') ||
+             (valor[0] == '\'' && valor[len-1] == '\''))) {
+            valor[len-1] = '\0';
+            valor++;
+        }
+
+#ifdef _WIN32
+        _putenv_s(chave, valor);
+#else
+        setenv(chave, valor, 0); /* 0 = nao sobrescreve se ja existir */
+#endif
+    }
+    fclose(f);
+}
+
+/* -------------------------------------------------------------------------
+ * Escapa caracteres especiais de JSON em `src` e grava em `dst`.
+ * Necessario antes de embutir qualquer string como valor dentro de JSON.
+ * ---------------------------------------------------------------------- */
+static void json_escape(const char *src, char *dst, size_t dst_size)
+{
+    size_t j = 0;
+    for (size_t i = 0; src[i] && j + 2 < dst_size; i++) {
+        if      (src[i] == '"')  { dst[j++] = '\\'; dst[j++] = '"';  }
+        else if (src[i] == '\\') { dst[j++] = '\\'; dst[j++] = '\\'; }
+        else if (src[i] == '\n') { dst[j++] = '\\'; dst[j++] = 'n';  }
+        else if (src[i] == '\r') { dst[j++] = '\\'; dst[j++] = 'r';  }
+        else if (src[i] == '\t') { dst[j++] = '\\'; dst[j++] = 't';  }
+        else                     { dst[j++] = src[i]; }
+    }
+    dst[j] = '\0';
+}
 
 /* -------------------------------------------------------------------------
  * Buffer dinamico acumulado pelo callback do cURL
@@ -39,47 +102,27 @@ static size_t callback_escrita(void *conteudo, size_t tamanho,
 }
 
 /* -------------------------------------------------------------------------
- * Prompts de sistema — um por jurado
- *
- * Cada prompt instrui o modelo a adotar a personalidade do jurado, avaliar
- * com base nos indices numericos recebidos e responder SOMENTE em JSON.
+ * Prompt unico que instrui o modelo a responder como os 3 jurados ao mesmo
+ * tempo, garantindo personalidades contrastantes numa so chamada de API.
  * ---------------------------------------------------------------------- */
-static const char *PROMPT_ARIANO =
-    "Voce e Ariano Suassuna, jurado simpatico de um concurso culinario nordestino. "
-    "Avalie o desempenho do jogador com base em dois indices numericos fornecidos: "
-    "aproveitamento (fracao de 0 a 1, indica quantos passos da receita foram acertados) e "
-    "pontuacao_relativa (fracao de 0 a 1, onde 1 e perfeito e valores baixos indicam erros). "
-    "Voce prioriza o aproveitamento: se o jogador completou a receita com cuidado e dedicacao, "
-    "merece nota alta mesmo com alguns erros de tempo. "
-    "Calcule sua nota de 0 a 10 (pode usar uma casa decimal) refletindo esses indices. "
-    "Escreva um comentario em portugues, no maximo 2 frases, no seu estilo poetico e caloroso. "
-    "Responda SOMENTE com JSON neste formato exato, sem nenhum outro texto: "
-    "{\"nota\": 7.5, \"comentario\": \"texto aqui\"}";
-
-static const char *PROMPT_CLARICE =
-    "Voce e Clarice Lispector, jurada exigente de um concurso culinario. "
-    "Avalie o desempenho do jogador com base em dois indices numericos fornecidos: "
-    "aproveitamento (fracao de 0 a 1, indica quantos passos da receita foram acertados) e "
-    "pontuacao_relativa (fracao de 0 a 1, onde 1 e perfeito e valores baixos indicam erros). "
-    "Voce prioriza a pontuacao_relativa: erros e excesso de tempo sao imperdoaveis. "
-    "Abaixo de 0.7 a nota e baixa (0-5), entre 0.7 e 0.9 e media (5-8), acima de 0.9 e excelente (8-10). "
-    "Calcule sua nota de 0 a 10 (pode usar uma casa decimal) refletindo esses indices. "
-    "Escreva um comentario em portugues, no maximo 2 frases, no seu estilo introspectivo e exigente. "
-    "Responda SOMENTE com JSON neste formato exato, sem nenhum outro texto: "
-    "{\"nota\": 7.5, \"comentario\": \"texto aqui\"}";
-
-static const char *PROMPT_CHICO =
-    "Voce e Chico Science, jurado criativo e inovador de um concurso culinario. "
-    "Avalie o desempenho do jogador com base em dois indices numericos fornecidos: "
-    "aproveitamento (fracao de 0 a 1, indica quantos passos da receita foram acertados) e "
-    "pontuacao_relativa (fracao de 0 a 1, onde 1 e perfeito e valores baixos indicam erros). "
-    "Voce prioriza criatividade e ousadia: se pontuacao_relativa >= 0.9 E aproveitamento >= 0.8, "
-    "o jogador foi alem do basico e merece nota maxima (9-10). "
-    "Se apenas um criterio for alto, a nota fica entre 6-8. Se ambos forem baixos, cai para 0-5. "
-    "Calcule sua nota de 0 a 10 (pode usar uma casa decimal) refletindo esses indices. "
-    "Escreva um comentario em portugues, no maximo 2 frases, no seu estilo mangue beat energico. "
-    "Responda SOMENTE com JSON neste formato exato, sem nenhum outro texto: "
-    "{\"nota\": 7.5, \"comentario\": \"texto aqui\"}";
+static const char *PROMPT_JURADOS =
+    "Voce e o sistema de avaliacao de um jogo de culinaria pernambucana chamado Receitas de Mainha. "
+    "Tres jurados lendarios vao avaliar o desempenho do jogador, cada um com personalidade e criterios MUITO diferentes. "
+    "Use os dados de desempenho enviados pelo usuario para calcular notas distintas para cada jurado. "
+    "\n\n"
+    "ARIANO SUASSUNA: Poeta simpatico do Nordeste. Valoriza esforca, dedicacao e o espírito cultural. "
+    "Da notas generosas: mesmo com erros, elogia a tentativa e o coracao. Faixa tipica de notas: 5 a 9. "
+    "\n\n"
+    "CLARICE LISPECTOR: Exigente e introspectiva. So aceita precisao e execucao impecavel. "
+    "Implacavel com erros e passos incompletos. Faixa tipica: 0 a 7; so acima de 8 para desempenho quase perfeito. "
+    "\n\n"
+    "CHICO SCIENCE: Criativo e energetico do mangue beat. Recompensa quem concluiu com ousadia e zero erros. "
+    "Sem meio-termo: receita concluida + sem erros = 9 a 10; mediana = 4 a 6; nenhum passo correto = 0 a 3. "
+    "\n\n"
+    "REGRA IMPORTANTE: as tres notas DEVEM ser diferentes entre si, refletindo as personalidades opostas dos jurados. "
+    "Escreva comentarios curtos em portugues (maximo 2 frases), no estilo de cada jurado. "
+    "Responda SOMENTE neste JSON exato, sem texto antes ou depois: "
+    "{\"ariano\":{\"nota\":7.5,\"comentario\":\"texto\"},\"clarice\":{\"nota\":5.0,\"comentario\":\"texto\"},\"chico\":{\"nota\":8.0,\"comentario\":\"texto\"}}";
 
 /* -------------------------------------------------------------------------
  * chamar_groq()
@@ -109,6 +152,12 @@ static int chamar_groq(const char *chave_api,
         return -1;
     }
 
+    /* Escapa aspas e barras antes de embutir as strings no JSON */
+    char prompt_esc[BODY_SIZE];
+    char mensagem_esc[1024];
+    json_escape(prompt_sistema,   prompt_esc,   sizeof(prompt_esc));
+    json_escape(mensagem_usuario, mensagem_esc, sizeof(mensagem_esc));
+
     /* Monta o corpo JSON da requisicao */
     char corpo[BODY_SIZE];
     snprintf(corpo, sizeof(corpo),
@@ -121,8 +170,8 @@ static int chamar_groq(const char *chave_api,
           "]"
         "}",
         GROQ_MODEL, GROQ_MAX_TOKENS,
-        prompt_sistema,
-        mensagem_usuario);
+        prompt_esc,
+        mensagem_esc);
 
     /* Headers obrigatorios para a API do Groq (formato OpenAI) */
     struct curl_slist *headers = NULL;
@@ -145,6 +194,15 @@ static int chamar_groq(const char *chave_api,
     if (res != CURLE_OK) {
         fprintf(stderr, "[groq] curl falhou: %s\n", curl_easy_strerror(res));
         goto cleanup;
+    }
+
+    {
+        long http_code = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+        if (http_code != 200) {
+            fprintf(stderr, "[groq] HTTP %ld — resposta: %.300s\n", http_code, buf.dados);
+            goto cleanup;
+        }
     }
 
     /* A API retorna JSON no padrao OpenAI:
@@ -237,15 +295,44 @@ static int extrair_nota_comentario(const char *json,
 }
 
 /* -------------------------------------------------------------------------
+ * extrair_jurado()
+ *
+ * Extrai {"nota":X,"comentario":"Y"} de um jurado especifico dentro do JSON
+ * raiz que contem {"ariano":{...},"clarice":{...},"chico":{...}}.
+ * Localiza a chave do jurado, avanca ate o '{' do sub-objeto e delega
+ * ao parser generico extrair_nota_comentario.
+ * Retorna 0 em sucesso, -1 em falha.
+ * ---------------------------------------------------------------------- */
+static int extrair_jurado(const char *json_raiz, const char *nome_jurado,
+                          float *nota, char *comentario, size_t tam)
+{
+    /* monta a chave de busca, ex: "ariano" */
+    char chave[32];
+    snprintf(chave, sizeof(chave), "\"%s\"", nome_jurado);
+
+    const char *ptr = strstr(json_raiz, chave);
+    if (!ptr) return -1;
+    ptr += strlen(chave);
+
+    /* avanca ate o '{' do sub-objeto */
+    while (*ptr && *ptr != '{') ptr++;
+    if (!*ptr) return -1;
+
+    return extrair_nota_comentario(ptr, nota, comentario, tam);
+}
+
+/* -------------------------------------------------------------------------
  * avaliar_com_jurados()
  *
- * Funcao publica. Chama os 3 jurados em sequencia, coleta as respostas,
- * parseia os JSONs e retorna a struct ResultadoJurados preenchida.
+ * Funcao publica. Faz UMA chamada a API com os 3 jurados no mesmo prompt,
+ * parseia o JSON aninhado e retorna a struct ResultadoJurados preenchida.
  * ---------------------------------------------------------------------- */
 ResultadoJurados avaliar_com_jurados(EstadoJogo estado)
 {
     ResultadoJurados resultado;
     memset(&resultado, 0, sizeof(resultado));
+
+    carregar_dotenv(".env");
 
     const char *chave = getenv("GROQ_API_KEY");
     if (!chave || chave[0] == '\0') {
@@ -253,42 +340,69 @@ ResultadoJurados avaliar_com_jurados(EstadoJogo estado)
         return resultado;
     }
 
-    /* Calcula os indices de desempenho uma unica vez */
-    float aproveitamento = (estado.passos_total > 0)
-                           ? (float)estado.passos_acertados / (float)estado.passos_total
-                           : 0.0f;
-    float pontuacao_rel  = (float)estado.pontuacao / 100.0f;
-
-    /* Mensagem enviada para todos os jurados com os indices numericos */
+    /* Monta mensagem com metricas claras e sem ambiguidade */
     char mensagem[512];
     snprintf(mensagem, sizeof(mensagem),
-        "Aproveitamento: %.2f (%.0f%% dos passos corretos). "
-        "Pontuacao relativa: %.2f (pontuacao bruta=%d de 100).",
-        aproveitamento, aproveitamento * 100.0f,
-        pontuacao_rel, estado.pontuacao);
+        "Passos corretos: %d de %d. "
+        "Erros cometidos: %d. "
+        "Tempo extra alem do limite: %d segundo(s). "
+        "Receita concluida: %s.",
+        estado.passos_acertados, estado.passos_total,
+        estado.erro_passo,
+        estado.tempo_extra,
+        (estado.passos_total > 0 &&
+         estado.passos_acertados == estado.passos_total) ? "sim" : "nao");
 
+    fprintf(stderr, "[groq] estado bruto: pontuacao=%d passos=%d/%d tempo_extra=%d erro_passo=%d\n",
+            estado.pontuacao, estado.passos_acertados, estado.passos_total,
+            estado.tempo_extra, estado.erro_passo);
+    fprintf(stderr, "[groq] mensagem enviada: %s\n", mensagem);
+
+    /* Uma unica chamada retorna os 3 jurados */
     char resposta[BUFFER_SIZE];
-
-    /* --- Ariano Suassuna --- */
     memset(resposta, 0, sizeof(resposta));
-    if (chamar_groq(chave, PROMPT_ARIANO, mensagem, resposta, sizeof(resposta)) == 0)
-        extrair_nota_comentario(resposta, &resultado.nota_ariano,
-                                resultado.comentario_ariano, 256);
 
-    /* --- Clarice Lispector --- */
-    memset(resposta, 0, sizeof(resposta));
-    if (chamar_groq(chave, PROMPT_CLARICE, mensagem, resposta, sizeof(resposta)) == 0)
-        extrair_nota_comentario(resposta, &resultado.nota_clarice,
-                                resultado.comentario_clarice, 256);
+    if (chamar_groq(chave, PROMPT_JURADOS, mensagem, resposta, sizeof(resposta)) != 0) {
+        fprintf(stderr, "[groq] chamada falhou\n");
+        return resultado;
+    }
 
-    /* --- Chico Science --- */
-    memset(resposta, 0, sizeof(resposta));
-    if (chamar_groq(chave, PROMPT_CHICO, mensagem, resposta, sizeof(resposta)) == 0)
-        extrair_nota_comentario(resposta, &resultado.nota_chico,
-                                resultado.comentario_chico, 256);
+    fprintf(stderr, "[groq] raw: %.600s\n", resposta);
 
-    resultado.media_final = (resultado.nota_ariano +
-                             resultado.nota_clarice +
-                             resultado.nota_chico) / 3.0f;
+    int jurados_ok = 0;
+
+    if (extrair_jurado(resposta, "ariano",
+                       &resultado.nota_ariano, resultado.comentario_ariano, 256) == 0) {
+        fprintf(stderr, "[groq] Ariano %.1f | %s\n",
+                resultado.nota_ariano, resultado.comentario_ariano);
+        jurados_ok++;
+    } else {
+        fprintf(stderr, "[groq] Ariano parse falhou\n");
+    }
+
+    if (extrair_jurado(resposta, "clarice",
+                       &resultado.nota_clarice, resultado.comentario_clarice, 256) == 0) {
+        fprintf(stderr, "[groq] Clarice %.1f | %s\n",
+                resultado.nota_clarice, resultado.comentario_clarice);
+        jurados_ok++;
+    } else {
+        fprintf(stderr, "[groq] Clarice parse falhou\n");
+    }
+
+    if (extrair_jurado(resposta, "chico",
+                       &resultado.nota_chico, resultado.comentario_chico, 256) == 0) {
+        fprintf(stderr, "[groq] Chico %.1f | %s\n",
+                resultado.nota_chico, resultado.comentario_chico);
+        jurados_ok++;
+    } else {
+        fprintf(stderr, "[groq] Chico parse falhou\n");
+    }
+
+    if (jurados_ok > 0)
+        resultado.media_final = (resultado.nota_ariano +
+                                 resultado.nota_clarice +
+                                 resultado.nota_chico) / (float)jurados_ok;
+
+    fprintf(stderr, "[groq] jurados_ok=%d media=%.2f\n", jurados_ok, resultado.media_final);
     return resultado;
 }

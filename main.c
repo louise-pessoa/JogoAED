@@ -10,6 +10,7 @@
 #include "fases/ordenacao.h"
 #include "fases/cozinhar.h"
 
+
 #define LARG_VIRTUAL 800
 #define ALT_VIRTUAL  600
 
@@ -58,14 +59,15 @@ static void atualizar_selecao_receitas(void) {
 
 // --- avaliacao dos jurados em thread separada ---
 static ResultadoJurados jurados;
-static int jurados_prontos     = 0;
-static int jurados_solicitados = 0;
-static pthread_t _thread_jurados_id;
+static int        jurados_prontos     = 0;
+static int        jurados_solicitados = 0;
+static pthread_t  _thread_jurados_id;
+static EstadoJogo _estado_snapshot;   // copia do estado no momento do disparo
 
 static void *_thread_jurados(void *arg) {
-    (void)arg;
-    jurados       = avaliar_com_jurados(estado);
-    jurados_prontos = 1;
+    EstadoJogo *snap = (EstadoJogo *)arg;
+    jurados          = avaliar_com_jurados(*snap);
+    jurados_prontos  = 1;
     return NULL;
 }
 
@@ -73,7 +75,8 @@ static void disparar_jurados(void) {
     if (jurados_solicitados) return;
     jurados_solicitados = 1;
     jurados_prontos     = 0;
-    pthread_create(&_thread_jurados_id, NULL, _thread_jurados, NULL);
+    _estado_snapshot    = estado;  // captura o estado AGORA, antes do thread rodar
+    pthread_create(&_thread_jurados_id, NULL, _thread_jurados, &_estado_snapshot);
     pthread_detach(_thread_jurados_id);
 }
 
