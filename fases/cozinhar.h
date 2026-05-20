@@ -2,8 +2,8 @@
 #define COZINHAR_H
 
 #include "raylib.h"
-#include "receitas.h"
-#include "estruturas/pilha.h"
+#include "../dados/receitas.h"
+#include "../dados/pilha.h"
 
 #define COZ_MAX_ING_GRID 8
 

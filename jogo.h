@@ -2,7 +2,7 @@
 #define JOGO_H
 
 #include <time.h>
-#include "receitas.h"
+#include "dados/receitas.h"
 
 // constantes do jogo
 #define PONTUACAO_INICIAL      100

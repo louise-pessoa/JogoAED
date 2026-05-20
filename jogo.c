@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <time.h>
 #include "jogo.h"
-#include "receitas.h"
-#include "estruturas/pilha.h"
+#include "dados/receitas.h"
+#include "dados/pilha.h"
 
 // estado interno do timer
 static clock_t _inicio_timer;

@@ -3,8 +3,8 @@
 #include <ctype.h>
 #include "raylib.h"
 #include "cozinhar.h"
-#include "jogo.h"
-#include "estruturas/pilha.h"
+#include "../jogo.h"
+#include "../dados/pilha.h"
 
 // ==========================================
 // CORES

@@ -2,7 +2,7 @@
 #include <string.h>
 #include "raylib.h"
 #include "ordenacao.h"
-#include "jogo.h"
+#include "../jogo.h"
 
 // ==========================================
 // CORES

@@ -2,13 +2,13 @@
 #include <math.h>
 #include <pthread.h>
 #include "raylib.h"
-#include "groq.h"
+#include "api/groq.h"
 #include "jogo.h"
-#include "interface.h"
-#include "receitas.h"
-#include "catcher.h"
-#include "ordenacao.h"
-#include "cozinhar.h"
+#include "ui/interface.h"
+#include "dados/receitas.h"
+#include "fases/catcher.h"
+#include "fases/ordenacao.h"
+#include "fases/cozinhar.h"
 
 #define LARG_VIRTUAL 800
 #define ALT_VIRTUAL  600

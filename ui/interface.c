@@ -3,8 +3,8 @@
 #include <string.h>
 #include "raylib.h"
 #include "interface.h"
-#include "jogo.h"
-#include "receitas.h"
+#include "../jogo.h"
+#include "../dados/receitas.h"
 
 // ==========================================
 // CORES DO PROJETO

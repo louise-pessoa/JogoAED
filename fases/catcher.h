@@ -2,7 +2,7 @@
 #define CATCHER_H
 
 #include "raylib.h"
-#include "receitas.h"
+#include "../dados/receitas.h"
 
 #define CATCHER_TEMPO_LIMITE    25
 #define CATCHER_MAX_ITENS       16

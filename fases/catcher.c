@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include "raylib.h"
 #include "catcher.h"
-#include "jogo.h"
+#include "../jogo.h"
 
 // ==========================================
 // CORES

@@ -17,16 +17,36 @@ gráfica em Raylib.
 
 ---
 
+## Estrutura de Pastas
+
+```
+JogoAED/
+├── main.c / jogo.h/c          # Loop principal e estado global do jogo
+├── dados/
+│   ├── pilha.h/c              # Pilha LIFO (passos da receita)
+│   └── receitas.h/c           # Listas encadeadas de receitas e ingredientes
+├── fases/
+│   ├── catcher.h/c            # Fase 1: coleta de ingredientes
+│   ├── ordenacao.h/c          # Fase 2: Insertion Sort animado
+│   └── cozinhar.h/c           # Fase 3: execução da pilha
+├── ui/interface.h/c           # Renderização Raylib (todas as telas)
+├── api/groq.h/c               # Jurados IA (Groq API)
+└── docs/                      # Documentação
+```
+
 ## Módulos do Projeto
 
 | Arquivo | Responsável | Escopo |
 |---|---|---|
-| `receitas.c/.h` | Mateus | Lista encadeada de receitas e ingredientes |
-| `pilha.c/.h` | Marília | Pilha de passos da receita |
+| `dados/receitas.c/.h` | Mateus | Lista encadeada de receitas e ingredientes |
+| `dados/pilha.c/.h` | Marília | Pilha de passos da receita |
 | `jogo.c/.h` | Victor | Lógica, fluxo e estado do jogo |
-| `timer.c/.h` | Louise | Timer, penalidades e integração |
-| `interface.c/.h` | Pedro | Raylib — menus, renderização, input |
-| `groq.c/.h` | — | Integração com API do Groq (jurados IA) |
+| `jogo.c/.h` | Louise | Timer, penalidades e integração |
+| `ui/interface.c/.h` | Pedro | Raylib — menus, renderização, input |
+| `api/groq.c/.h` | — | Integração com API do Groq (jurados IA) |
+| `fases/catcher.c/.h` | — | Minijogo de coleta de ingredientes |
+| `fases/ordenacao.c/.h` | — | Visualização do Insertion Sort |
+| `fases/cozinhar.c/.h` | — | Execução dos passos via pilha |
 
 ---
 
