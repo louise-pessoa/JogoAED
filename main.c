@@ -92,6 +92,12 @@ int main(void) {
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_ESCAPE)) {
             if (tela_atual == TELA_MENU) break;
+            if (tela_atual == TELA_RESULTADO) {
+                resetar_partida();
+                receita_selecionada = NULL;
+                jurados_prontos     = 0;
+                jurados_solicitados = 0;
+            }
             tela_atual = TELA_MENU;
         }
         // ---- alterna fullscreen ----
@@ -178,16 +184,6 @@ int main(void) {
                     IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
                     disparar_jurados();
                     tela_atual = TELA_RESULTADO;
-                }
-                break;
-
-            case TELA_RESULTADO:
-                if (IsKeyPressed(KEY_ENTER) && !IsKeyDown(KEY_LEFT_ALT)) {
-                    resetar_partida();
-                    receita_selecionada  = NULL;
-                    jurados_prontos      = 0;
-                    jurados_solicitados  = 0;
-                    tela_atual = TELA_MENU;
                 }
                 break;
 

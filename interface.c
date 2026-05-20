@@ -366,7 +366,7 @@ void tela_resultado(int venceu, ResultadoJurados *j)
     int tw = MeasureText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!", 20);
     DrawText(venceu ? "Parabens! Voce e o melhor cozinheiro!" : "Continue treinando com mainha!",
              (800-tw)/2, 508, 20, COR_AMARELO);
-    DrawText("[ENTER] Jogar novamente  [ESC] Menu", 220, 540, 18, WHITE);
+    DrawText("[ESC] Voltar ao menu", 300, 540, 18, WHITE);
 }
 
 // ==========================================

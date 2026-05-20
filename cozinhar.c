@@ -4,6 +4,7 @@
 #include "raylib.h"
 #include "cozinhar.h"
 #include "jogo.h"
+#include "estruturas/pilha.h"
 
 // ==========================================
 // CORES
@@ -79,12 +80,26 @@ static void marcar_destacado(void) {
 }
 
 void cozinhar_iniciar(Receita *receita) {
+    // libera pilha anterior se existir
+    while (!pilha_vazia(cozinhar.pilha))
+        cozinhar.pilha = pop_passo(cozinhar.pilha);
+
     memset(&cozinhar, 0, sizeof(cozinhar));
     cozinhar.receita = receita;
     if (receita == NULL || receita->n_passos_jog == 0) {
         cozinhar.terminou = 1;
         cozinhar.venceu = 0;
         return;
+    }
+
+    // empilha os passos em ordem reversa: ultimo passo entra primeiro,
+    // assim o topo da pilha (LIFO) corresponde ao primeiro passo da receita
+    int i = receita->n_passos_jog - 1;
+    while (i >= 0) {
+        cozinhar.pilha = push_passo(cozinhar.pilha,
+                                    receita->passos_jog[i].acao,
+                                    receita->passos_jog[i].ingrediente);
+        i--;
     }
 
     montar_grid();
@@ -101,7 +116,7 @@ void cozinhar_iniciar(Receita *receita) {
     cozinhar.venceu = 0;
     marcar_destacado();
 
-    printf("[COZINHAR] Iniciado para '%s' com %d passos\n",
+    printf("[COZINHAR] Iniciado para '%s' com %d passos (pilha carregada)\n",
            receita->nome, receita->n_passos_jog);
 }
 
@@ -178,8 +193,10 @@ static void fase_feedback(void) {
     cozinhar.feedback_timer += GetFrameTime();
     if (cozinhar.feedback_timer >= 1.0f) {
         if (cozinhar.feedback_acerto) {
+            // pop: remove passo concluido do topo da pilha
+            cozinhar.pilha = pop_passo(cozinhar.pilha);
             cozinhar.passo_idx++;
-            if (cozinhar.passo_idx >= cozinhar.receita->n_passos_jog) {
+            if (pilha_vazia(cozinhar.pilha)) {
                 cozinhar.terminou = 1;
                 cozinhar.venceu = 1;
                 cozinhar.fase = COZ_FASE_FIM;

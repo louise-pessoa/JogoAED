@@ -54,8 +54,10 @@ void resetar_partida(void) {
     estado.rodada_atual     = 1;
     estado.em_execucao      = 0;
     estado.fase_final_ativa = 0;
-    estado.passos_acertados  = 0;   
-    estado.passos_total      = 0;  
+    estado.passos_acertados  = 0;
+    estado.passos_total      = 0;
+    estado.tempo_extra       = 0;
+    estado.erro_passo        = 0;
     _inicio_timer           = 0;
     //jurados_prontos = 0;
 
@@ -121,16 +123,16 @@ void integrar_modulos(void) {
     Receita *escondidinho = buscar_receita(receitas_disponiveis, "Escondidinho");
     inserir_ingrediente(escondidinho, "Carne de sol",  "400g");
     inserir_ingrediente(escondidinho, "Mandioca",      "600g");
-    inserir_ingrediente(escondidinho, "Queijo coalho", "200g");
     inserir_ingrediente(escondidinho, "Manteiga",      "2 colheres");
+    inserir_ingrediente(escondidinho, "Queijo coalho", "200g");
 
-    // === ingredientes do Bolo de Rolo ===
+    // === ingredientes do Bolo de Rolo (ordem de uso: manteiga, acucar, ovos, farinha, goiabada) ===
     Receita *bolo = buscar_receita(receitas_disponiveis, "Bolo de Rolo");
-    inserir_ingrediente(bolo, "Farinha de trigo", "300g");
     inserir_ingrediente(bolo, "Manteiga",         "200g");
-    inserir_ingrediente(bolo, "Ovos",             "6 unidades");
-    inserir_ingrediente(bolo, "Goiabada",         "300g");
     inserir_ingrediente(bolo, "Acucar",           "200g");
+    inserir_ingrediente(bolo, "Ovos",             "6 unidades");
+    inserir_ingrediente(bolo, "Farinha de trigo", "300g");
+    inserir_ingrediente(bolo, "Goiabada",         "300g");
 
     // === passos jogaveis ===
     // tapioca: hidrata, mistura coco, derrete manteiga

@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "receitas.h"
+#include "estruturas/pilha.h"
 
 #define COZ_MAX_ING_GRID 8
 
@@ -42,6 +43,8 @@ typedef struct {
 
     int   terminou;
     int   venceu;            // 1 se concluiu todos os passos
+
+    No   *pilha;             // pilha de passos da receita (topo = passo atual)
 } EstadoCozinhar;
 
 extern EstadoCozinhar cozinhar;
