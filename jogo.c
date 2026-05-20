@@ -116,6 +116,7 @@ void integrar_modulos(void) {
     inserir_ingrediente(tapioca, "Tapioca granulada", "200g");
     inserir_ingrediente(tapioca, "Coco ralado",       "50g");
     inserir_ingrediente(tapioca, "Manteiga",          "1 colher");
+    inserir_ingrediente(tapioca, "Queijo",            "80g");
 
     // === ingredientes do Sururu ===
     Receita *sururu = buscar_receita(receitas_disponiveis, "Sururu");
@@ -131,6 +132,8 @@ void integrar_modulos(void) {
     inserir_ingrediente(bolo, "Ovos",             "6 unidades");
     inserir_ingrediente(bolo, "Goiabada",         "300g");
     inserir_ingrediente(bolo, "Acucar",           "200g");
+    inserir_ingrediente(bolo, "Baunilha",         "1 colher");
+    inserir_ingrediente(bolo, "Fermento",         "1 colher");
 
     // === passos jogaveis ===
     // tapioca: hidrata, mistura coco, derrete manteiga

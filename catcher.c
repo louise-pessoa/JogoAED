@@ -27,8 +27,8 @@
 #define ALT_HUD         70           // faixa superior reservada
 #define ALT_CHAO        40
 
-#define CESTA_LARGURA   120.0f
-#define CESTA_ALTURA    50.0f
+#define CESTA_LARGURA   220.0f
+#define CESTA_ALTURA    95.0f
 #define CESTA_VEL       420.0f
 
 #define ITEM_RAIO       22.0f
@@ -42,6 +42,220 @@
 // ESTADO GLOBAL
 // ==========================================
 EstadoCatcher catcher;
+
+// sprites carregadas uma vez no inicio do jogo
+static Texture2D _spr_cesta;
+static int _spr_cesta_carregado = 0;
+
+static Texture2D _spr_massa_tapioca;
+static int _spr_massa_tapioca_carregado = 0;
+
+static Texture2D _spr_coco_ralado;
+static int _spr_coco_ralado_carregado = 0;
+
+static Texture2D _spr_queijo;
+static int _spr_queijo_carregado = 0;
+
+static Texture2D _spr_manteiga;
+static int _spr_manteiga_carregado = 0;
+
+static Texture2D _spr_carne;
+static int _spr_carne_carregado = 0;
+
+static Texture2D _spr_cebola;
+static int _spr_cebola_carregado = 0;
+
+static Texture2D _spr_mandioca;
+static int _spr_mandioca_carregado = 0;
+
+static Texture2D _spr_acucar;
+static int _spr_acucar_carregado = 0;
+
+static Texture2D _spr_baunilha;
+static int _spr_baunilha_carregado = 0;
+
+static Texture2D _spr_farinha;
+static int _spr_farinha_carregado = 0;
+
+static Texture2D _spr_fermento;
+static int _spr_fermento_carregado = 0;
+
+static Texture2D _spr_goiabada;
+static int _spr_goiabada_carregado = 0;
+
+static Texture2D _spr_leite;
+static int _spr_leite_carregado = 0;
+
+static Texture2D _spr_ovo;
+static int _spr_ovo_carregado = 0;
+
+void catcher_carregar_sprites(void) {
+    _spr_cesta = LoadTexture("sprites/cesta.png");
+    if (_spr_cesta.id != 0) {
+        SetTextureFilter(_spr_cesta, TEXTURE_FILTER_BILINEAR);
+        _spr_cesta_carregado = 1;
+    }
+
+    _spr_massa_tapioca = LoadTexture("sprites/massa_tapioca.png");
+    if (_spr_massa_tapioca.id != 0) {
+        SetTextureFilter(_spr_massa_tapioca, TEXTURE_FILTER_BILINEAR);
+        _spr_massa_tapioca_carregado = 1;
+    }
+
+    _spr_coco_ralado = LoadTexture("sprites/coco_ralado.png");
+    if (_spr_coco_ralado.id != 0) {
+        SetTextureFilter(_spr_coco_ralado, TEXTURE_FILTER_BILINEAR);
+        _spr_coco_ralado_carregado = 1;
+    }
+
+    _spr_queijo = LoadTexture("sprites/queijo.png");
+    if (_spr_queijo.id != 0) {
+        SetTextureFilter(_spr_queijo, TEXTURE_FILTER_BILINEAR);
+        _spr_queijo_carregado = 1;
+    }
+
+    _spr_manteiga = LoadTexture("sprites/manteiga.png");
+    if (_spr_manteiga.id != 0) {
+        SetTextureFilter(_spr_manteiga, TEXTURE_FILTER_BILINEAR);
+        _spr_manteiga_carregado = 1;
+    }
+
+    _spr_carne = LoadTexture("sprites/carne.png");
+    if (_spr_carne.id != 0) {
+        SetTextureFilter(_spr_carne, TEXTURE_FILTER_BILINEAR);
+        _spr_carne_carregado = 1;
+    }
+
+    _spr_cebola = LoadTexture("sprites/cebola.png");
+    if (_spr_cebola.id != 0) {
+        SetTextureFilter(_spr_cebola, TEXTURE_FILTER_BILINEAR);
+        _spr_cebola_carregado = 1;
+    }
+
+    _spr_mandioca = LoadTexture("sprites/mandioca.png");
+    if (_spr_mandioca.id != 0) {
+        SetTextureFilter(_spr_mandioca, TEXTURE_FILTER_BILINEAR);
+        _spr_mandioca_carregado = 1;
+    }
+
+    _spr_acucar = LoadTexture("sprites/acucar.png");
+    if (_spr_acucar.id != 0) {
+        SetTextureFilter(_spr_acucar, TEXTURE_FILTER_BILINEAR);
+        _spr_acucar_carregado = 1;
+    }
+
+    _spr_baunilha = LoadTexture("sprites/baunilha.png");
+    if (_spr_baunilha.id != 0) {
+        SetTextureFilter(_spr_baunilha, TEXTURE_FILTER_BILINEAR);
+        _spr_baunilha_carregado = 1;
+    }
+
+    _spr_farinha = LoadTexture("sprites/farinha.png");
+    if (_spr_farinha.id != 0) {
+        SetTextureFilter(_spr_farinha, TEXTURE_FILTER_BILINEAR);
+        _spr_farinha_carregado = 1;
+    }
+
+    _spr_fermento = LoadTexture("sprites/fermento.png");
+    if (_spr_fermento.id != 0) {
+        SetTextureFilter(_spr_fermento, TEXTURE_FILTER_BILINEAR);
+        _spr_fermento_carregado = 1;
+    }
+
+    _spr_goiabada = LoadTexture("sprites/goiabada.png");
+    if (_spr_goiabada.id != 0) {
+        SetTextureFilter(_spr_goiabada, TEXTURE_FILTER_BILINEAR);
+        _spr_goiabada_carregado = 1;
+    }
+
+    _spr_leite = LoadTexture("sprites/leite.png");
+    if (_spr_leite.id != 0) {
+        SetTextureFilter(_spr_leite, TEXTURE_FILTER_BILINEAR);
+        _spr_leite_carregado = 1;
+    }
+
+    _spr_ovo = LoadTexture("sprites/ovo.png");
+    if (_spr_ovo.id != 0) {
+        SetTextureFilter(_spr_ovo, TEXTURE_FILTER_BILINEAR);
+        _spr_ovo_carregado = 1;
+    }
+}
+
+void catcher_descarregar_sprites(void) {
+    if (_spr_cesta_carregado) {
+        UnloadTexture(_spr_cesta);
+        _spr_cesta_carregado = 0;
+    }
+    if (_spr_massa_tapioca_carregado) {
+        UnloadTexture(_spr_massa_tapioca);
+        _spr_massa_tapioca_carregado = 0;
+    }
+    if (_spr_coco_ralado_carregado) {
+        UnloadTexture(_spr_coco_ralado);
+        _spr_coco_ralado_carregado = 0;
+    }
+    if (_spr_queijo_carregado) {
+        UnloadTexture(_spr_queijo);
+        _spr_queijo_carregado = 0;
+    }
+    if (_spr_manteiga_carregado) {
+        UnloadTexture(_spr_manteiga);
+        _spr_manteiga_carregado = 0;
+    }
+    if (_spr_carne_carregado) {
+        UnloadTexture(_spr_carne);
+        _spr_carne_carregado = 0;
+    }
+    if (_spr_cebola_carregado) {
+        UnloadTexture(_spr_cebola);
+        _spr_cebola_carregado = 0;
+    }
+    if (_spr_mandioca_carregado) {
+        UnloadTexture(_spr_mandioca);
+        _spr_mandioca_carregado = 0;
+    }
+    if (_spr_acucar_carregado)   { UnloadTexture(_spr_acucar);   _spr_acucar_carregado   = 0; }
+    if (_spr_baunilha_carregado) { UnloadTexture(_spr_baunilha); _spr_baunilha_carregado = 0; }
+    if (_spr_farinha_carregado)  { UnloadTexture(_spr_farinha);  _spr_farinha_carregado  = 0; }
+    if (_spr_fermento_carregado) { UnloadTexture(_spr_fermento); _spr_fermento_carregado = 0; }
+    if (_spr_goiabada_carregado) { UnloadTexture(_spr_goiabada); _spr_goiabada_carregado = 0; }
+    if (_spr_leite_carregado)    { UnloadTexture(_spr_leite);    _spr_leite_carregado    = 0; }
+    if (_spr_ovo_carregado)      { UnloadTexture(_spr_ovo);      _spr_ovo_carregado      = 0; }
+}
+
+// retorna o sprite correspondente ao nome do ingrediente, ou NULL se nao houver
+static const Texture2D* _sprite_para_ingrediente(const char *nome) {
+    if (_spr_massa_tapioca_carregado && strstr(nome, "Tapioca") != NULL) {
+        return &_spr_massa_tapioca;
+    }
+    if (_spr_coco_ralado_carregado && strstr(nome, "Coco") != NULL) {
+        return &_spr_coco_ralado;
+    }
+    if (_spr_queijo_carregado && strstr(nome, "Queijo") != NULL) {
+        return &_spr_queijo;
+    }
+    if (_spr_manteiga_carregado && strstr(nome, "Manteiga") != NULL) {
+        return &_spr_manteiga;
+    }
+    if (_spr_carne_carregado && strstr(nome, "Carne") != NULL) {
+        return &_spr_carne;
+    }
+    // exato pra Cebola (evita conflito com "Cebolinha" que e distrator)
+    if (_spr_cebola_carregado && strcmp(nome, "Cebola") == 0) {
+        return &_spr_cebola;
+    }
+    if (_spr_mandioca_carregado && strstr(nome, "Mandioca") != NULL) {
+        return &_spr_mandioca;
+    }
+    if (_spr_acucar_carregado   && strstr(nome, "Acucar")   != NULL) return &_spr_acucar;
+    if (_spr_baunilha_carregado && strstr(nome, "Baunilha") != NULL) return &_spr_baunilha;
+    if (_spr_farinha_carregado  && strstr(nome, "Farinha")  != NULL) return &_spr_farinha;
+    if (_spr_fermento_carregado && strstr(nome, "Fermento") != NULL) return &_spr_fermento;
+    if (_spr_goiabada_carregado && strstr(nome, "Goiabada") != NULL) return &_spr_goiabada;
+    if (_spr_leite_carregado    && strstr(nome, "Leite")    != NULL) return &_spr_leite;
+    if (_spr_ovo_carregado      && strstr(nome, "Ovo")      != NULL) return &_spr_ovo;
+    return NULL;
+}
 
 // lista de distratores: ingredientes que NAO devem entrar na receita.
 // (mistura de coisas comestiveis e bobas pra atrapalhar)
@@ -311,42 +525,80 @@ static void desenhar_cesta(void) {
     float w = catcher.cesta_w;
     float h = catcher.cesta_h;
 
-    // borda superior (alca)
-    DrawRectangleRounded((Rectangle){x - 6, y - 8, w + 12, 14}, 0.6f, 8, COR_CESTA_ESC);
+    if (_spr_cesta_carregado) {
+        // desenha o sprite escalonado pro tamanho da cesta
+        Rectangle src = { 0, 0, (float)_spr_cesta.width, (float)_spr_cesta.height };
+        Rectangle dst = { x, y, w, h };
+        DrawTexturePro(_spr_cesta, src, dst, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    } else {
+        // fallback: desenho geometrico se o sprite nao carregou
+        // borda superior (alca)
+        DrawRectangleRounded((Rectangle){x - 6, y - 8, w + 12, 14}, 0.6f, 8, COR_CESTA_ESC);
 
-    // corpo da cesta (trapezoide simulado por dois retangulos)
-    DrawRectangleRounded((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA);
-    DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA_ESC);
+        // corpo da cesta (trapezoide simulado por dois retangulos)
+        DrawRectangleRounded((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA);
+        DrawRectangleRoundedLines((Rectangle){x, y, w, h}, 0.35f, 8, COR_CESTA_ESC);
 
-    // tramas horizontais
-    for (int i = 1; i < 4; i++) {
-        float ly = y + (h / 4.0f) * i;
-        DrawLine((int)(x + 6), (int)ly, (int)(x + w - 6), (int)ly, COR_CESTA_ESC);
-    }
-    // tramas verticais
-    for (int i = 1; i < 6; i++) {
-        float lx = x + (w / 6.0f) * i;
-        DrawLine((int)lx, (int)(y + 4), (int)lx, (int)(y + h - 4), COR_CESTA_ESC);
+        // tramas horizontais
+        for (int i = 1; i < 4; i++) {
+            float ly = y + (h / 4.0f) * i;
+            DrawLine((int)(x + 6), (int)ly, (int)(x + w - 6), (int)ly, COR_CESTA_ESC);
+        }
+        // tramas verticais
+        for (int i = 1; i < 6; i++) {
+            float lx = x + (w / 6.0f) * i;
+            DrawLine((int)lx, (int)(y + 4), (int)lx, (int)(y + h - 4), COR_CESTA_ESC);
+        }
     }
 }
 
 static void desenhar_item(const ItemCaindo *it) {
     if (!it->ativo) return;
 
-    // sombra
-    DrawCircle((int)it->x + 3, (int)it->y + 3, ITEM_RAIO, (Color){0, 0, 0, 60});
-    // corpo
-    DrawCircle((int)it->x, (int)it->y, ITEM_RAIO, it->cor);
-    DrawCircleLines((int)it->x, (int)it->y, ITEM_RAIO,
-                    it->eh_da_receita ? COR_BOM : COR_RUIM);
+    const Texture2D *spr = _sprite_para_ingrediente(it->nome);
 
-    // letra inicial centralizada
-    char letra[2] = { (char)toupper((unsigned char)it->nome[0]), '\0' };
-    int tam = 22;
-    int lw = MeasureText(letra, tam);
-    DrawText(letra, (int)it->x - lw / 2, (int)it->y - tam / 2, tam, WHITE);
+    if (spr != NULL) {
+        // tamanho de exibicao mantendo o aspect ratio original do sprite
+        float aspect = (float)spr->width / (float)spr->height;
+        float tam_alvo = ITEM_RAIO * 5.0f;  // ~110px
+        float dw, dh;
+        if (aspect >= 1.0f) {
+            dw = tam_alvo;
+            dh = tam_alvo / aspect;
+        } else {
+            dh = tam_alvo;
+            dw = tam_alvo * aspect;
+        }
 
-    // rotulo curto abaixo
+        // sombra
+        DrawTextureEx(*spr, (Vector2){ it->x - dw/2 + 3, it->y - dh/2 + 3 },
+                      0.0f, dw / (float)spr->width, (Color){0, 0, 0, 80});
+
+        // desenha o sprite centralizado
+        Rectangle src = { 0, 0, (float)spr->width, (float)spr->height };
+        Rectangle dst = { it->x - dw/2, it->y - dh/2, dw, dh };
+        DrawTexturePro(*spr, src, dst, (Vector2){ 0, 0 }, 0.0f, WHITE);
+
+        // borda colorida indicando se eh da receita
+        DrawCircleLines((int)it->x, (int)it->y, ITEM_RAIO + 2,
+                        it->eh_da_receita ? COR_BOM : COR_RUIM);
+    } else {
+        // fallback: desenho circular original
+        // sombra
+        DrawCircle((int)it->x + 3, (int)it->y + 3, ITEM_RAIO, (Color){0, 0, 0, 60});
+        // corpo
+        DrawCircle((int)it->x, (int)it->y, ITEM_RAIO, it->cor);
+        DrawCircleLines((int)it->x, (int)it->y, ITEM_RAIO,
+                        it->eh_da_receita ? COR_BOM : COR_RUIM);
+
+        // letra inicial centralizada
+        char letra[2] = { (char)toupper((unsigned char)it->nome[0]), '\0' };
+        int tam = 22;
+        int lw = MeasureText(letra, tam);
+        DrawText(letra, (int)it->x - lw / 2, (int)it->y - tam / 2, tam, WHITE);
+    }
+
+    // rotulo curto abaixo (sempre desenha pra dar identidade ao item)
     int tw = MeasureText(it->nome, 12);
     DrawText(it->nome, (int)it->x - tw / 2, (int)it->y + ITEM_RAIO + 2,
              12, COR_TEXTO);

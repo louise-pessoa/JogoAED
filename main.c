@@ -85,6 +85,9 @@ int main(void) {
     InitWindow(LARG_VIRTUAL, ALT_VIRTUAL, "Receitas de Mainha");
     SetTargetFPS(60);
 
+    // carrega sprites depois que a janela existe (textura precisa de contexto OpenGL)
+    catcher_carregar_sprites();
+
     RenderTexture2D alvo = LoadRenderTexture(LARG_VIRTUAL, ALT_VIRTUAL);
     SetTextureFilter(alvo.texture, TEXTURE_FILTER_BILINEAR);
 
@@ -251,6 +254,7 @@ int main(void) {
     }
 
     UnloadRenderTexture(alvo);
+    catcher_descarregar_sprites();
     liberar_receitas(receitas_disponiveis);
     CloseWindow();
     return 0;
