@@ -1,5 +1,9 @@
 CC     = gcc
-SRCS   = main.c jogo.c receitas.c estruturas/pilha.c groq.c catcher.c cozinhar.c interface.c ordenacao.c
+SRCS   = main.c jogo.c \
+         dados/receitas.c dados/pilha.c \
+         api/groq.c \
+         fases/catcher.c fases/cozinhar.c fases/ordenacao.c \
+         ui/interface.c
 TARGET = sabores
 
 # Detecta o sistema operacional
@@ -12,7 +16,7 @@ RAYLIB_LIBS := $(shell pkg-config --libs raylib 2>/dev/null)
 # Se pkg-config falhar, usa configuração padrão por SO
 ifeq ($(RAYLIB_LIBS),)
 	# Linux padrão
-	CFLAGS = -I/usr/include
+	CFLAGS = -I. -I/usr/include
 	LIBS = -lraylib -lm -lpthread -ldl -lrt -lX11 -lcurl
 	
 	# macOS
@@ -22,7 +26,7 @@ ifeq ($(RAYLIB_LIBS),)
 	endif
 else
 	# Usa pkg-config
-	CFLAGS = $(RAYLIB_CFLAGS)
+	CFLAGS = -I. $(RAYLIB_CFLAGS)
 	LIBS = $(RAYLIB_LIBS) -lm -lpthread -lcurl
 	
 	# Remove flags específicas do Linux se estiver no macOS

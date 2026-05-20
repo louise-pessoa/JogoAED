@@ -131,14 +131,11 @@ void integrar_modulos(void) {
     Receita *bolo = buscar_receita(receitas_disponiveis, "Bolo de Rolo");
     inserir_ingrediente(bolo, "Manteiga",         "200g");
     inserir_ingrediente(bolo, "Acucar",           "200g");
-<<<<<<< HEAD
-    inserir_ingrediente(bolo, "Baunilha",         "1 colher");
-    inserir_ingrediente(bolo, "Fermento",         "1 colher");
-=======
     inserir_ingrediente(bolo, "Ovos",             "6 unidades");
     inserir_ingrediente(bolo, "Farinha de trigo", "300g");
     inserir_ingrediente(bolo, "Goiabada",         "300g");
->>>>>>> 1d74a90399d8500d4bee655f327c622817eba718
+    inserir_ingrediente(bolo, "Baunilha",         "1 colher");
+    inserir_ingrediente(bolo, "Fermento",         "1 colher");
 
     // === passos jogaveis ===
     // tapioca: hidrata, mistura coco, derrete manteiga
